@@ -5,11 +5,12 @@ https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/dataset_format.md
 
 The script to be used on a single dataset or multiple datasets.
 
-An option to create region-based labels for segmenting both lesion and the spinal cord is also provided.
+The script in default creates region-based labels for segmenting both lesion and the spinal cord.
+
 Currently only supports the conversion of a single contrast. In case of multiple contrasts, the script should be
 modified to include those as well.
 
-# Note: the script performs RPI reorientation of the images and labels
+Note: the script performs RPI reorientation of the images and labels
 
 Usage example multiple datasets:
     python convert_bids_to_nnUNetv2_praxis.py
