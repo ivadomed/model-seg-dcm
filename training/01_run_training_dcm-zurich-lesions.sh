@@ -2,6 +2,10 @@
 #
 # Run nnUNet training and testing on dcm-zurich-lesions and dcm-zurich-lesions-20231115 datasets
 #
+# Usage:
+#     cd ~/code/model-seg-dcm
+#     ./training/01_run_training_dcm-zurich-lesions.sh
+#
 # Author: Jan Valosek, Naga Karthik
 #
 
