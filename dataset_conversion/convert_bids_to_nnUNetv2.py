@@ -62,8 +62,8 @@ def get_parser():
                         help='Specify the task number, has to be greater than 500 but less than 999. e.g 502')
     parser.add_argument('--seed', default=42, type=int,
                         help='Seed to be used for the random number generator split into training and test sets.')
-    parser.add_argument('--region-based', action='store_true', default=False,
-                        help='If set, the script will create labels for region-based nnUNet training. Default: False')
+    parser.add_argument('--region-based', action='store_true', default=True,
+                        help='If set, the script will create labels for region-based nnUNet training. Default: True')
     # argument that accepts a list of floats as train val test splits
     parser.add_argument('--split', nargs='+', type=float, default=[0.8, 0.2],
                         help='Ratios of training (includes validation) and test splits lying between 0-1. Example: '
