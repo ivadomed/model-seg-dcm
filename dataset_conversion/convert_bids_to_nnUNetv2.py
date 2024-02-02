@@ -377,7 +377,7 @@ def main():
 
     logger.info(f"----- Dataset conversion finished! -----")
     logger.info(f"Number of training and validation images (across all sites): {train_ctr}")
-    logger.info(f"Number of test images: {test_ctr}")
+    logger.info(f"Number of test images (across all sites): {test_ctr}")
     # Get number of test images per site
     test_images_per_site = {}
     for test_subject in test_images:
