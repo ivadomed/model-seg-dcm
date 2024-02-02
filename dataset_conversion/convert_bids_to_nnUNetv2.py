@@ -279,8 +279,6 @@ def main():
     # Counters for train and test sets
     train_ctr, test_ctr = 0, 0
     train_niftis, test_nifitis = [], []
-    # Loop over all subjects
-    for subject_label_file in tqdm(all_lesion_files, desc="Iterating over all subjects"):
     # Loop over all images
     for subject_label_file in tqdm(all_lesion_files, desc="Iterating over all images"):
 
