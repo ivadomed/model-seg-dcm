@@ -361,7 +361,6 @@ def main():
             # copy the files to new structure
             shutil.copyfile(subject_image_file, subject_image_file_nnunet)
             print(f"\nCopying {subject_image_file} to {subject_image_file_nnunet}")
-
             # convert the image and label to RPI using the Image class
             image = Image(subject_image_file_nnunet)
             image.change_orientation("RPI")
