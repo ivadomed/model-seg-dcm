@@ -240,7 +240,7 @@ def main():
         for site in sites:
             create_directories(path_out, site)
 
-    all_lesion_files, train_images, test_subjects = [], {}, {}
+    all_lesion_files, train_images, test_images = [], {}, {}
     # temp dict for storing dataset commits
     dataset_commits = {}
 
@@ -262,15 +262,15 @@ def main():
         # Get the training and test splits
         tr_subs, te_subs = train_test_split(lesion_files, test_size=test_ratio, random_state=args.seed)
 
-        # update the train and test subjects dicts with the key as the subject and value as the path to the subject
+        # update the train and test images dicts with the key as the subject and value as the path to the subject
         train_images.update({sub: os.path.join(root, sub) for sub in tr_subs})
-        test_subjects.update({sub: os.path.join(root, sub) for sub in te_subs})
+        test_images.update({sub: os.path.join(root, sub) for sub in te_subs})
 
     logger.info(f"Found subjects in the training set (combining all datasets): {len(train_images)}")
-    logger.info(f"Found subjects in the test set (combining all datasets): {len(test_subjects)}")
-    # Print test subjects for each site
+    logger.info(f"Found subjects in the test set (combining all datasets): {len(test_images)}")
+    # Print test images for each site
     for site in sites:
-        logger.info(f"Test subjects in {site}: {len([sub for sub in test_subjects if site in sub])}")
+        logger.info(f"Test subjects in {site}: {len([sub for sub in test_images if site in sub])}")
 
     # print version of each dataset in a separate line
     for dataset_name, dataset_commit in dataset_commits.items():
@@ -327,25 +327,25 @@ def main():
             if not args.region_based:
                 binarize_label(subject_image_file_nnunet, subject_label_file_nnunet)
 
-        # Test subjects
-        elif subject_label_file in test_subjects:
+        # Test images
+        elif subject_label_file in test_images:
 
             test_ctr += 1
-            # add the subject image file to the list of testing niftis
+            # add the image file to the list of testing niftis
             test_nifitis.append(os.path.basename(subject_image_file))
 
             # create the new convention names for nnunet
             sub_name = f"{str(Path(subject_image_file).name).replace('.nii.gz', '')}"
 
             subject_image_file_nnunet = os.path.join(Path(path_out,
-                                                          f'imagesTs_{find_site_in_path(test_subjects[subject_label_file])}'),
+                                                          f'imagesTs_{find_site_in_path(test_images[subject_label_file])}'),
                                                      f'{args.dataset_name}_{sub_name}_{test_ctr:03d}_0000.nii.gz')
             subject_label_file_nnunet = os.path.join(Path(path_out,
-                                                          f'labelsTs_{find_site_in_path(test_subjects[subject_label_file])}'),
+                                                          f'labelsTs_{find_site_in_path(test_images[subject_label_file])}'),
                                                      f'{args.dataset_name}_{sub_name}_{test_ctr:03d}.nii.gz')
 
             # use region-based labels if required
-            if args.region_based and find_site_in_path(test_subjects[subject_label_file]) != 'site_014':
+            if args.region_based and find_site_in_path(test_images[subject_label_file]) != 'site_014':
                 # overwritten the subject_label_file with the region-based label
                 subject_label_file = get_region_based_label(subject_label_file,
                                                             subject_image_file, sub_name, thr=0.5)
@@ -379,7 +379,7 @@ def main():
     logger.info(f"Number of test images: {test_ctr}")
     # Get number of test images per site
     test_images_per_site = {}
-    for test_subject in test_subjects:
+    for test_subject in test_images:
         site = find_site_in_path(test_subject)
         if site in test_images_per_site:
             test_images_per_site[site] += 1
