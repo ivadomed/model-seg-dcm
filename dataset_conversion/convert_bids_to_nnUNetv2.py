@@ -73,7 +73,7 @@ def get_parser():
 
 def get_region_based_label(subject_label_file, subject_image_file, sub_ses_name, thr=0.5):
     # define path for sc seg file
-    subject_seg_file = subject_label_file.replace('_lesion', '_seg')
+    subject_seg_file = subject_label_file.replace('_label-lesion', '_label-SC_mask-manual')
 
     # check if the seg file exists
     if not os.path.exists(subject_seg_file):
@@ -85,7 +85,7 @@ def get_region_based_label(subject_label_file, subject_image_file, sub_ses_name,
                                                sub_ses_name, thr=thr)
 
     # save the region-based label
-    combined_seg_file = subject_label_file.replace('_lesion', '_seg-lesion')
+    combined_seg_file = subject_label_file.replace('_label-lesion', '_SC-lesion')
     nib.save(seg_lesion_nii, combined_seg_file)
 
     return combined_seg_file
@@ -253,8 +253,8 @@ def main():
         branch, commit = get_git_branch_and_commit(dataset)
         dataset_commits[dataset_name] = f"git-{branch}-{commit}"
 
-        # get recursively all GT '_lesion' files
-        lesion_files = [str(path) for path in root.rglob('*_lesion.nii.gz')]
+        # get recursively all GT '_label-lesion' files
+        lesion_files = [str(path) for path in root.rglob('*_label-lesion.nii.gz')]
 
         # add to the list of all subjects
         all_lesion_files.extend(lesion_files)
@@ -283,7 +283,7 @@ def main():
     for subject_label_file in tqdm(all_lesion_files, desc="Iterating over all subjects"):
 
         # Construct path to the background image
-        subject_image_file = subject_label_file.replace('/derivatives/labels', '').replace('_lesion', '')
+        subject_image_file = subject_label_file.replace('/derivatives/labels', '').replace('_label-lesion', '')
 
         # Train images
         if subject_label_file in train_images.keys():
