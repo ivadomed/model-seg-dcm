@@ -281,6 +281,8 @@ def main():
     train_niftis, test_nifitis = [], []
     # Loop over all subjects
     for subject_label_file in tqdm(all_lesion_files, desc="Iterating over all subjects"):
+    # Loop over all images
+    for subject_label_file in tqdm(all_lesion_files, desc="Iterating over all images"):
 
         # Construct path to the background image
         subject_image_file = subject_label_file.replace('/derivatives/labels', '').replace('_label-lesion', '')
