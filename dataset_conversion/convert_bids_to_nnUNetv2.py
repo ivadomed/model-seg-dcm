@@ -353,6 +353,7 @@ def main():
                     continue
 
                 shutil.copyfile(subject_label_file, subject_label_file_nnunet)
+                print(f"\nCopying {subject_label_file} to {subject_label_file_nnunet}")
                 label = Image(subject_label_file_nnunet)
                 label.change_orientation("RPI")
                 label.save(subject_label_file_nnunet)
