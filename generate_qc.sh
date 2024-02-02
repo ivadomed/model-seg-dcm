@@ -61,22 +61,12 @@ cd ${SUBJECT}/anat
 # Add suffix corresponding to contrast
 file=${file}_acq-ax_T2w
 
-# Make sure the image metadata is a valid JSON object
-if [[ ! -s ${file}.json ]]; then
-  echo "{}" >> ${file}.json
-fi
-
 # Go to subject folder for segmentation GTs
 cd $PATH_DATA_PROCESSED/derivatives/labels/$SUBJECT/anat
 
 # Define variables
 file_gt="${file}_label-lesion"
 file_seg="${file}_label-SC_mask-manual"
-
-# Make sure the GT metadata is a valid JSON object
-if [[ ! -s ${file_gt}.json ]]; then
-  echo "{}" >> ${file_gt}.json
-fi
 
 # Binarize the GTs because QC only accepts binary images
 sct_maths -i ${file_gt}.nii.gz -bin 0.5 -o ${file_gt}_bin.nii.gz
