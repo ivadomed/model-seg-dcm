@@ -1,12 +1,14 @@
 #!/bin/bash
 #
-# Generate QC report.
+# Generate QC report for:
+#     - Spinal cord segmentation
+#     - Lesion segmentation
 #
 # Dependencies (versions):
-# - SCT (X.X.0)
+# - SCT (6.0 and higher)
 #
 # Usage:
-# sct_run_batch -path-data <PATH-TO-DATASET> -path-output <PATH-TO-OUTPUT> -jobs <num-cpu-cores> -script preprocess_data.sh
+# sct_run_batch -path-data <PATH-TO-DATASET> -path-output <PATH-TO-OUTPUT> -jobs <num-cpu-cores> -script generate_qc.sh
 
 # Manual segmentations or labels should be located under:
 # PATH_DATA/derivatives/labels/SUBJECT/anat/
