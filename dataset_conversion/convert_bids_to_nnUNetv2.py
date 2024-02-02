@@ -240,7 +240,7 @@ def main():
         for site in sites:
             create_directories(path_out, site)
 
-    all_lesion_files, train_subjects, test_subjects = [], {}, {}
+    all_lesion_files, train_images, test_subjects = [], {}, {}
     # temp dict for storing dataset commits
     dataset_commits = {}
 
@@ -263,10 +263,10 @@ def main():
         tr_subs, te_subs = train_test_split(lesion_files, test_size=test_ratio, random_state=args.seed)
 
         # update the train and test subjects dicts with the key as the subject and value as the path to the subject
-        train_subjects.update({sub: os.path.join(root, sub) for sub in tr_subs})
+        train_images.update({sub: os.path.join(root, sub) for sub in tr_subs})
         test_subjects.update({sub: os.path.join(root, sub) for sub in te_subs})
 
-    logger.info(f"Found subjects in the training set (combining all datasets): {len(train_subjects)}")
+    logger.info(f"Found subjects in the training set (combining all datasets): {len(train_images)}")
     logger.info(f"Found subjects in the test set (combining all datasets): {len(test_subjects)}")
     # Print test subjects for each site
     for site in sites:
@@ -285,8 +285,8 @@ def main():
         # Construct path to the background image
         subject_image_file = subject_label_file.replace('/derivatives/labels', '').replace('_lesion', '')
 
-        # Train subjects
-        if subject_label_file in train_subjects.keys():
+        # Train images
+        if subject_label_file in train_images.keys():
 
             train_ctr += 1
             # add the subject image file to the list of training niftis
