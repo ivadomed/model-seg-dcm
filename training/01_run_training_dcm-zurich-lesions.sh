@@ -58,7 +58,7 @@ for fold in ${folds[@]}; do
         echo "Running ANIMA evaluation on Test set for ${site} "
         echo "-------------------------------------------------------"
 
-        python training/02_compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name}/labelsTs_${site} -dname ${site} --label-type lesion
+        python training/02_compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name}/labelsTs_${site} --dataset-name ${site}
 
     done
 
