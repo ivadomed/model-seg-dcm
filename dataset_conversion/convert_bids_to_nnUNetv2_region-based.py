@@ -1,5 +1,27 @@
 """
-Convert BIDS-structured datasets (dcm-zurich-lesions, dcm-zurich-lesions-20231115) to the nnUNetv2 dataset format.
+Convert BIDS-structured datasets (dcm-zurich-lesions, dcm-zurich-lesions-20231115) to the nnUNetv2 dataset REGION-BASED
+format.
+
+dataset.json:
+
+```json
+    "channel_names": {
+        "0": "acq-ax_T2w"
+    },
+    "labels": {
+        "background": 0,
+        "sc": [
+            1,
+            2
+        ],
+        "lesion": 2
+    },
+    "regions_class_order": [
+        1,
+        2
+    ],
+```
+
 Full details about the format can be found here:
 https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/dataset_format.md
 
@@ -53,7 +75,7 @@ import nibabel as nib
 
 def get_parser():
     # parse command line arguments
-    parser = argparse.ArgumentParser(description='Convert BIDS-structured dataset to nnUNetV2 database format.')
+    parser = argparse.ArgumentParser(description='Convert BIDS-structured dataset to nnUNetV2 REGION-BASED format.')
     parser.add_argument('--path-data', nargs='+', required=True, type=str,
                         help='Path to BIDS dataset(s) (list).')
     parser.add_argument('--path-out', help='Path to output directory.', required=True)
