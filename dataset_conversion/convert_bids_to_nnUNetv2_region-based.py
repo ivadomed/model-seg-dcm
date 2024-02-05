@@ -201,7 +201,7 @@ def create_yaml(train_niftis, test_nifitis, path_out, args, train_ctr, test_ctr,
     """
 
     json_dict['channel_names'] = {
-        0: "acq-sag_T2w",
+        0: "acq-ax_T2w",
     }
 
     if not args.region_based:
