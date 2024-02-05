@@ -20,7 +20,7 @@ def binarize_label(subject_path, label_path):
 
 def create_region_based_label(lesion_label_file, seg_label_file, image_file, sub_ses_name, thr=0.5):
     """
-    Creates region-based labels for nnUNet training. The regions are: 
+    Creates region-based labels for REGION-BASED nnUNet training. The regions are:
     0: background
     1: spinal cord seg
     2: lesion seg
