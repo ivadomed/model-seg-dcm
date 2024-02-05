@@ -35,7 +35,7 @@ modified to include those as well.
 Note: the script performs RPI reorientation of the images and labels
 
 Usage example multiple datasets:
-    python convert_bids_to_nnUNetv2_praxis.py
+    python convert_bids_to_nnUNetv2_region-based.py
         --path-data ~/data/dcm-zurich-lesions ~/data/dcm-zurich-lesions-20231115
         --path-out ${nnUNet_raw}
         -dname DCMlesions
@@ -45,7 +45,7 @@ Usage example multiple datasets:
         --region-based
 
 Usage example single dataset:
-    python convert_bids_to_nnUNetv2_praxis.py
+    python convert_bids_to_nnUNetv2_region-based.py
         --path-data ~/data/dcm-zurich-lesions
         --path-out ${nnUNet_raw}
         -dname DCMlesions
