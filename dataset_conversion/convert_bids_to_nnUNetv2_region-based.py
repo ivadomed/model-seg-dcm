@@ -79,7 +79,7 @@ def get_parser():
     parser.add_argument('--path-data', nargs='+', required=True, type=str,
                         help='Path to BIDS dataset(s) (list).')
     parser.add_argument('--path-out', help='Path to output directory.', required=True)
-    parser.add_argument('--dataset-name', '-dname', default='DCMlesions', type=str,
+    parser.add_argument('--dataset-name', '-dname', default='DCMlesionsRegionBased', type=str,
                         help='Specify the task name.')
     parser.add_argument('--dataset-number', '-dnum', default=601, type=int,
                         help='Specify the task number, has to be greater than 500 but less than 999. e.g 502')
