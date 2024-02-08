@@ -40,16 +40,3 @@ def fetch_filename_details(filename_path):
     # *? - match the previous element as few times as possible (zero or more times)
 
     return datasetName, subjectID, sessionID, fileID, fileName, seg_type
-
-
-
-if __name__ == '__main__':
-    # test the function
-    filename = '/home/GRAMES.POLYMTL.CA/u114716/nnunet-v2/nnUNet_raw/Dataset200_tSCIZurichRPISeed99/imagesTs/tSCIZurichRPISeed99_sub-zh39_ses-01_012_0000.nii.gz'
-    # filename = '/home/GRAMES.POLYMTL.CA/u114716/nnunet-v2/nnUNet_raw/Dataset251_tSCIColorado/imagesTs/tSCIColorado_sub-5602_002_0000.nii.gz'
-    datasetName, subjectID, sessionID, fileID, fileName = fetch_filename_details(filename)
-    print(f'Dataset name: {datasetName}')
-    print(f'Subject ID: {subjectID}')
-    print(f'Session ID: {sessionID}')
-    print(f'File ID: {fileID}')
-    print(f'Filename: {fileName}')
