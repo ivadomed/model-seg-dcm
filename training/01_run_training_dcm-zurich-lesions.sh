@@ -29,6 +29,8 @@ cuda_visible_devices=1
 folds=(1 2)
 #folds=(3)
 sites=(dcm-zurich-lesions dcm-zurich-lesions-20231115)
+region_based="--region-based"
+#region_based=""
 
 
 echo "-------------------------------------------------------"
@@ -58,7 +60,7 @@ for fold in ${folds[@]}; do
         echo "Running ANIMA evaluation on Test set for ${site} "
         echo "-------------------------------------------------------"
 
-        python training/02_compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name}/labelsTs_${site} --dataset-name ${site}
+        python training/02_compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name}/labelsTs_${site} --dataset-name ${site} ${region_based}
 
     done
 
