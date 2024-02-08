@@ -22,6 +22,7 @@ trap "echo Caught Keyboard Interrupt within script. Exiting now.; exit" INT
 # define arguments for nnUNet
 dataset_num="601"
 dataset_name="Dataset${dataset_num}_DCMlesions"
+nnunet_trainer="nnUNetTrainerDiceCELoss_noSmooth"
 nnunet_trainer="nnUNetTrainer"
 #nnunet_trainer="nnUNetTrainer_2000epochs"       # default: nnUNetTrainer
 configuration="3d_fullres"                      # for 2D training, use "2d"
