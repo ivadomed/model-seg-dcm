@@ -399,6 +399,18 @@ def main():
 
     logger.info(f"----- Dataset conversion finished! -----")
     logger.info(f"Number of training and validation images (across all sites): {train_ctr}")
+    # Get number of train and val images per site
+    train_images_per_site = {}
+    for train_subject in train_images:
+        site = find_site_in_path(train_subject)
+        if site in train_images_per_site:
+            train_images_per_site[site] += 1
+        else:
+            train_images_per_site[site] = 1
+    # Print number of train images per site
+    for site, num_images in train_images_per_site.items():
+        logger.info(f"Number of training and validation images in {site}: {num_images}")
+
     logger.info(f"Number of test images (across all sites): {test_ctr}")
     # Get number of test images per site
     test_images_per_site = {}
