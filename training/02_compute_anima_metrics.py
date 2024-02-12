@@ -117,7 +117,8 @@ def get_parser():
                              'Options: "sc" for spinal cord segmentation, "lesion" for lesion segmentation'
                              'NOTE: when label-type is "lesion", additional lesion detection metrics, namely,'
                              'Lesion PPV, Lesion Sensitivity, and F1_score are computed'
-                             'NOTE: this argument is ignored when region-based is set to True')
+                             'NOTE: this argument is ignored when region-based is set to True, and both "sc" and '
+                             '"lesion" are computed for each subject.')
 
     return parser
 
