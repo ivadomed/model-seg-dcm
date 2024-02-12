@@ -214,7 +214,8 @@ def main():
     args = parser.parse_args()
 
     train_ratio, test_ratio = args.split
-    path_out = Path(os.path.join(os.path.abspath(args.path_out), f'Dataset{args.dataset_number}_{args.dataset_name}'))
+    path_out = Path(os.path.join(os.path.abspath(args.path_out), f'Dataset{args.dataset_number}_{args.dataset_name}'
+                                                                 f'Seed{args.seed}'))
 
     # create individual directories for train and test images and labels
     path_out_imagesTr = Path(os.path.join(path_out, 'imagesTr'))
