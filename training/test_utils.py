@@ -1,0 +1,42 @@
+import os
+import re
+
+
+def fetch_filename_details(filename_path):
+    """
+    Get dataset name, subject name, session number (if exists), file ID and filename from the input nnUNet-compatible 
+    filename or file path. The function works both on absolute file path as well as filename
+    :param filename_path: input nifti filename (e.g., sub-001_ses-01_T1w.nii.gz) or file path
+    (e.g., /home/user/MRI/bids/derivatives/labels/sub-001/ses-01/anat/sub-001_ses-01_T1w.nii.gz
+    :return: datasetName: dataset name
+    :return: subjectID: subject ID (e.g., sub-001)
+    :return: sessionID: session ID (e.g., ses-01)
+    :return: fileID: file ID (e.g., 001)
+    :return: fileName: filename (e.g., sub-001_ses-01_T1w.nii.gz)
+    :return: seg_type: segmentation type (e.g., sc or lesion)
+    
+    Adapted from: https://github.com/spinalcordtoolbox/manual-correction/blob/main/utils.py#L24
+    """
+
+    _, fileName = os.path.split(filename_path)              # Get just the filename (i.e., remove the path)
+    datasetName = fileName.split('_')[0]              # Get the dataset name (i.e., remove the filename)
+    
+    subject = re.search('sub-(.*?)[_/]', filename_path)
+    subjectID = subject.group(0)[:-1] if subject else ""    # [:-1] removes the last underscore or slash
+    
+    session = re.findall(r'ses-..', filename_path)
+    sessionID = session[0] if session else ""               # Return None if there is no session
+
+    fID = re.search('_\d{3}', fileName)
+    fileID = fID.group(0)[1:] if fID else ""        # [1:-1] removes the underscores
+
+    # Fetch segtype (sc or lesion)
+    seg_type = re.search('sc|lesion', filename_path)
+    seg_type = seg_type.group(0) if seg_type else ""
+
+    # REGEX explanation
+    # \d - digit
+    # \d? - no or one occurrence of digit
+    # *? - match the previous element as few times as possible (zero or more times)
+
+    return datasetName, subjectID, sessionID, fileID, fileName, seg_type
