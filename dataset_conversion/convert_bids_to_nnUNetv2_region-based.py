@@ -1,6 +1,5 @@
 """
-Convert BIDS-structured datasets (dcm-zurich-lesions, dcm-zurich-lesions-20231115) to the nnUNetv2 dataset REGION-BASED
-format.
+Convert BIDS-structured datasets (dcm-zurich-lesions, dcm-zurich-lesions-20231115) to the nnUNetv2 REGION-BASED format.
 
 dataset.json:
 
