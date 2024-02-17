@@ -53,7 +53,7 @@ import yaml
 from collections import OrderedDict
 from loguru import logger
 from sklearn.model_selection import train_test_split
-from utils import binarize_label, create_multi_channel_label, get_git_branch_and_commit, Image
+from utils import create_multi_channel_label, get_git_branch_and_commit, Image
 from tqdm import tqdm
 
 import nibabel as nib
