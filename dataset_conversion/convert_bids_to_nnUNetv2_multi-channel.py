@@ -30,7 +30,6 @@ Usage example multiple datasets:
         -dnum 601
         --split 0.8 0.2
         --seed 50
-        --region-based
 
 Usage example single dataset:
     python convert_bids_to_nnUNetv2_multi-channel.py
@@ -40,7 +39,6 @@ Usage example single dataset:
         -dnum 601
         --split 0.8 0.2
         --seed 50
-        --region-based
 
 Authors: Jan Valosek,  Naga Karthik
 """
