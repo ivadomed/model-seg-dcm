@@ -92,7 +92,7 @@ def get_multi_channel_label(subject_label_file, subject_image_file, sub_ses_name
     seg_lesion_nii = create_multi_channel_label(subject_label_file, subject_seg_file, subject_image_file,
                                                 sub_ses_name, thr=thr)
 
-    # save the region-based label
+    # save the label
     combined_seg_file = subject_label_file.replace('_label-lesion', '_SC-lesion')
     nib.save(seg_lesion_nii, combined_seg_file)
 
