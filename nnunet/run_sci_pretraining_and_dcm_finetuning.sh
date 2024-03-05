@@ -27,8 +27,12 @@ cuda_visible_devices=1
 folds=(1)
 sites=(dcm-zurich-lesions dcm-zurich-lesions-20231115)
 nnunet_trainer="nnUNetTrainerDiceCELoss_noSmooth"
-# nnunet_trainer="nnUNetTrainer_1epoch"       # default: nnUNetTrainer; nnUNetTrainer_Xepochs
+# nnunet_trainer="nnUNetTrainer"       # default: nnUNetTrainer; nnUNetTrainer_Xepochs
 configuration="3d_fullres"                      # for 2D training, use "2d"
+
+# NOTE: after pre-training for 1000 epochs, fine-tuning doesn't need that many epochs
+# hence, creating a new variant with less epochs
+nnunet_trainer_ftu="nnUNetTrainerDiceCELoss_noSmooth_500epochs"
 
 # Variables for pretraining on SCI data 3 sites (i.e. source dataset)
 dataset_num_ptr="190"
@@ -91,7 +95,7 @@ for fold in ${folds[@]}; do
     echo "-------------------------------------------"
 
     # training
-    CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_train ${dataset_name_ftu} ${configuration} ${fold} -tr ${nnunet_trainer} -pretrained_weights ${path_ptr_weights}
+    CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_train ${dataset_name_ftu} ${configuration} ${fold} -tr ${nnunet_trainer_ftu} -pretrained_weights ${path_ptr_weights}
 
     echo ""
     echo "-------------------------------------------"
@@ -100,13 +104,13 @@ for fold in ${folds[@]}; do
 
     # run inference on testing sets for each site
     for site in ${sites[@]}; do
-        CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/${dataset_name_ftu}/imagesTs_${site} -tr ${nnunet_trainer} -o ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} -d ${dataset_num_ftu} -f ${fold} -c ${configuration}
+        CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/${dataset_name_ftu}/imagesTs_${site} -tr ${nnunet_trainer_ftu} -o ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetMovedPlans__${configuration}/fold_${fold}/test_${site} -d ${dataset_num_ftu} -f ${fold} -c ${configuration}
 
         echo "-------------------------------------------------------"
         echo "Running ANIMA evaluation on Test set for ${site} "
         echo "-------------------------------------------------------"
 
-        python testing/compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name_ftu}/labelsTs_${site} --dataset-name ${site}
+        python testing/compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer_ftu}__nnUNetMovedPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name_ftu}/labelsTs_${site} --dataset-name ${site}
 
     done
 

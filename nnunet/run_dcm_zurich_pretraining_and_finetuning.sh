@@ -30,6 +30,10 @@ nnunet_trainer="nnUNetTrainer"
 # nnunet_trainer="nnUNetTrainer_2000epochs"       # default: nnUNetTrainer
 configuration="3d_fullres"                      # for 2D training, use "2d"
 
+# NOTE: after pre-training for 1000 epochs, fine-tuning doesn't need that many epochs
+# hence, creating a new variant with less epochs
+nnunet_trainer_ftu="nnUNetTrainer_250epochs"
+
 # Variables for pretraining on dcm-zurich (i.e. source dataset)
 dataset_num_ptr="191"
 dataset_name_ptr="Dataset${dataset_num_ptr}_dcmZurichPretrain"
@@ -91,7 +95,7 @@ for fold in ${folds[@]}; do
     echo "-------------------------------------------"
 
     # training
-    CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_train ${dataset_name_ftu} ${configuration} ${fold} -tr ${nnunet_trainer} -pretrained_weights ${path_ptr_weights}
+    CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_train ${dataset_name_ftu} ${configuration} ${fold} -tr ${nnunet_trainer_ftu} -pretrained_weights ${path_ptr_weights}
 
     echo ""
     echo "-------------------------------------------"
@@ -100,13 +104,13 @@ for fold in ${folds[@]}; do
 
     # run inference on testing sets for each site
     for site in ${sites[@]}; do
-        CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/${dataset_name_ftu}/imagesTs_${site} -tr ${nnunet_trainer} -o ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} -d ${dataset_num_ftu} -f ${fold} -c ${configuration}
+        CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/${dataset_name_ftu}/imagesTs_${site} -tr ${nnunet_trainer_ftu} -o ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetMovedPlans__${configuration}/fold_${fold}/test_${site} -d ${dataset_num_ftu} -f ${fold} -c ${configuration}
 
         echo "-------------------------------------------------------"
         echo "Running ANIMA evaluation on Test set for ${site} "
         echo "-------------------------------------------------------"
 
-        python testing/compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name_ftu}/labelsTs_${site} --dataset-name ${site}
+        python testing/compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer_ftu}__nnUNetMovedPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name_ftu}/labelsTs_${site} --dataset-name ${site}
 
     done
 
