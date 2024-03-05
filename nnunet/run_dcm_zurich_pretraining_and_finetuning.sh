@@ -70,7 +70,7 @@ echo "-------------------------------------------------------"
 echo "Running pretraining on ${dataset_name_ptr} ..."
 echo "-------------------------------------------------------"
 # training
-CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_train ${dataset_num_ptr} ${configuration} all -tr ${nnunet_trainer}
+CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_train ${dataset_num_ptr} ${configuration} all -tr ${nnunet_trainer} -p nnUNetMovedPlans
 
 echo "-------------------------------------------------------"
 echo "Running inference on ${dataset_name_ptr} ..."
