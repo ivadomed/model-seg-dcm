@@ -82,7 +82,7 @@ CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/$
 echo "-------------------------------------------------------"
 echo "Pretraining done, Running finetuning on ${dataset_name_ftu} ..."
 echo "-------------------------------------------------------"
-path_ptr_weights=${nnUNet_results}/${dataset_name_ptr}/${nnunet_trainer}__nnUNetPlans__${configuration}/fold_all/checkpoint_best.pth
+path_ptr_weights=${nnUNet_results}/${dataset_name_ptr}/${nnunet_trainer}__nnUNetMovedPlans__${configuration}/fold_all/checkpoint_best.pth
 
 
 for fold in ${folds[@]}; do
