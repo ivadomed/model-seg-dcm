@@ -104,13 +104,13 @@ for fold in ${folds[@]}; do
 
     # run inference on testing sets for each site
     for site in ${sites[@]}; do
-        CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/${dataset_name_ftu}/imagesTs_${site} -tr ${nnunet_trainer_ftu} -o ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer}__nnUNetMovedPlans__${configuration}/fold_${fold}/test_${site} -d ${dataset_num_ftu} -f ${fold} -c ${configuration}
+        CUDA_VISIBLE_DEVICES=${cuda_visible_devices} nnUNetv2_predict -i ${nnUNet_raw}/${dataset_name_ftu}/imagesTs_${site} -tr ${nnunet_trainer_ftu} -o ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer_ftu}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} -d ${dataset_num_ftu} -f ${fold} -c ${configuration}
 
         echo "-------------------------------------------------------"
         echo "Running ANIMA evaluation on Test set for ${site} "
         echo "-------------------------------------------------------"
 
-        python testing/compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer_ftu}__nnUNetMovedPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name_ftu}/labelsTs_${site} --dataset-name ${site}
+       python testing/compute_anima_metrics.py --pred-folder ${nnUNet_results}/${dataset_name_ftu}/${nnunet_trainer_ftu}__nnUNetPlans__${configuration}/fold_${fold}/test_${site} --gt-folder ${nnUNet_raw}/${dataset_name_ftu}/labelsTs_${site} --dataset-name ${site}
 
     done
 
