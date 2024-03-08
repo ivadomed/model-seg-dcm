@@ -17,6 +17,7 @@ from monai.utils import set_determinism, first
 from monai.networks.nets import ViTAutoEnc
 from monai.losses import ContrastiveLoss
 from monai.data import (
+    Dataset,
     DataLoader,
     CacheDataset,
 )
@@ -70,6 +71,16 @@ def main():
     #ROI_SIZE = (64, 64, 64)
     ROI_SIZE = SPATIAL_SIZE
     transforms = define_pretrain_transforms(spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
+
+    # -----------------------------------------------------
+    # Sanity Check for the transforms
+    # -----------------------------------------------------
+    check_ds = Dataset(data=train_list, transform=transforms)
+    check_loader = DataLoader(check_ds, batch_size=1)
+    check_data = first(check_loader)
+    print(f'original image shape: {check_data["gt_image"][0][0].shape}')
+    print(f'augmented image 1 shape: {check_data["image"][0][0].shape}')
+    print(f'augmented image 2 shape: {check_data["image_2"][0][0].shape}')
 
     # -----------------------------------------------------
     # Training Config
