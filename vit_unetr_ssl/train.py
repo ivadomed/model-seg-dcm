@@ -69,7 +69,7 @@ def main():
     SPATIAL_SIZE = (64, 256, 256)
     #ROI_SIZE = (64, 64, 64)
     ROI_SIZE = SPATIAL_SIZE
-    transforms = define_pretrain_transforms(crop_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
+    transforms = define_pretrain_transforms(spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
 
     # -----------------------------------------------------
     # Training Config
