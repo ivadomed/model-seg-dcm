@@ -92,7 +92,7 @@ def main():
         # Get the training and test splits
         tr_subs, te_subs = train_test_split(subjects, test_size=test_ratio, random_state=args.seed)
         if "sci-paris" in dataset:
-            # add all test subjects to the to the training set
+            # add all test subjects to the training set
             tr_subs.extend(te_subs)
             te_subs = []
         tr_subs, val_subs = train_test_split(tr_subs, test_size=val_ratio / (train_ratio + val_ratio), random_state=args.seed)
