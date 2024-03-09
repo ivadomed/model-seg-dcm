@@ -188,7 +188,7 @@ def main():
         with torch.no_grad():
             for _step, batch in enumerate(epoch_iterator_val):
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label"].cuda(CUDA_NUM))
-                val_outputs = sliding_window_inference(val_inputs, (96, 96, 96), 4, model)
+                val_outputs = sliding_window_inference(val_inputs, SPATIAL_SIZE, batch_size, model)
                 val_labels_list = decollate_batch(val_labels)
                 val_labels_convert = [post_label(val_label_tensor) for val_label_tensor in val_labels_list]
                 val_outputs_list = decollate_batch(val_outputs)
