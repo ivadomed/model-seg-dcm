@@ -16,9 +16,9 @@ def get_parser():
     parser.add_argument('--path-data', nargs='+', required=True, type=str, help='Path to BIDS dataset(s) (list).')
     parser.add_argument('--path-out', type=str, required=True,
                         help='Path to the output directory where dataset json is saved')
-    parser.add_argument('--split', nargs='+', type=float, default=[0.7, 0.2, 0.1], 
+    parser.add_argument('--split', nargs='+', type=float, default=[0.6, 0.2, 0.2],
                         help='Ratios of training, validation and test splits lying between 0-1. '
-                        'Example: --split 0.7 0.2 0.1')
+                        'Example: --split 0.6 0.2 0.2')
     parser.add_argument('--seed', default=42, type=int, help="Seed for reproducibility")
     parser.add_argument('--pathology', default='dcm', type=str, required=True,
                         help="Type of pathology in the dataset(s). Default: 'dcm' (for dcm-zurich-lesions). "
