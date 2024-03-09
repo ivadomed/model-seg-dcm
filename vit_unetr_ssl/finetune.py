@@ -97,7 +97,9 @@ def main():
     # Training Config
     # -----------------------------------------------------
 
-    device = torch.device("cuda:0")
+    CUDA_NUM=2
+
+    device = torch.device(f"cuda:{CUDA_NUM}")
     model = UNETR(
         in_channels=1,
         out_channels=1,
@@ -185,7 +187,7 @@ def main():
 
         with torch.no_grad():
             for _step, batch in enumerate(epoch_iterator_val):
-                val_inputs, val_labels = (batch["image"].cuda(), batch["label"].cuda())
+                val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label"].cuda(CUDA_NUM))
                 val_outputs = sliding_window_inference(val_inputs, (96, 96, 96), 4, model)
                 val_labels_list = decollate_batch(val_labels)
                 val_labels_convert = [post_label(val_label_tensor) for val_label_tensor in val_labels_list]
@@ -207,7 +209,7 @@ def main():
         epoch_iterator = tqdm(train_loader, desc="Training (X / X Steps) (loss=X.X)", dynamic_ncols=True)
         for step, batch in enumerate(epoch_iterator):
             step += 1
-            x, y = (batch["image"].cuda(), batch["label"].cuda())
+            x, y = (batch["image"].cuda(CUDA_NUM), batch["label"].cuda(CUDA_NUM))
             logit_map = model(x)
             loss = loss_function(logit_map, y)
             loss.backward()
