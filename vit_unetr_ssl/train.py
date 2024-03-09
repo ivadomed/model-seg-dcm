@@ -80,9 +80,9 @@ def main():
     check_ds = Dataset(data=train_list, transform=transforms)
     check_loader = DataLoader(check_ds, batch_size=1)
     check_data = first(check_loader)
-    print(f'original image shape: {check_data["gt_image"][0][0].shape}')
-    print(f'augmented image 1 shape: {check_data["image"][0][0].shape}')
-    print(f'augmented image 2 shape: {check_data["image_2"][0][0].shape}')
+    logger.info(f'original image shape: {check_data["gt_image"][0][0].shape}')
+    logger.info(f'augmented image 1 shape: {check_data["image"][0][0].shape}')
+    logger.info(f'augmented image 2 shape: {check_data["image_2"][0][0].shape}')
 
     # -----------------------------------------------------
     # Training Config
