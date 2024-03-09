@@ -3,6 +3,8 @@ Self-Supervised Pre-training using Vision Transformer (ViT)
 
 This script is based on this MONAI tutorial:
 https://github.com/Project-MONAI/tutorials/tree/main/self_supervised_pretraining/vit_unetr_ssl
+
+Author: Jan Valosek
 """
 
 import os
