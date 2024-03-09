@@ -1,3 +1,5 @@
+import numpy as np
+
 from monai.transforms import (
     LoadImaged,
     Compose,
@@ -14,8 +16,14 @@ from monai.transforms import (
     RandCoarseDropoutd,
     RandCoarseShuffled,
     RandFlipd,
-    RandRotate90d,
-    RandShiftIntensityd,
+    RandScaleIntensityd,
+    RandGaussianNoised,
+    RandGaussianSmoothd,
+    RandBiasFieldd,
+    RandAdjustContrastd,
+    RandSimulateLowResolutiond,
+    Rand3DElasticd,
+    RandAffined,
     ToTensord
 )
 
@@ -122,38 +130,30 @@ def define_finetune_train_transforms(spatial_size):
                 spatial_size=spatial_size,
                 pos=1,
                 neg=1,
-                num_samples=4,
+                num_samples=4,  # if num_samples=4, then 4 samples/image are randomly generated
                 image_key="image",
                 image_threshold=0,
             ),
-            # TODO: reconsider the following transforms;
-            #  check https://github.com/sct-pipeline/contrast-agnostic-softseg-spinalcord/blob/main/monai/transforms.py#L20-L33
-            RandFlipd(
-                keys=["image", "label"],
-                spatial_axis=[0],
-                prob=0.10,
-            ),
-            RandFlipd(
-                keys=["image", "label"],
-                spatial_axis=[1],
-                prob=0.10,
-            ),
-            RandFlipd(
-                keys=["image", "label"],
-                spatial_axis=[2],
-                prob=0.10,
-            ),
-            RandRotate90d(
-                keys=["image", "label"],
-                prob=0.10,
-                max_k=3,
-            ),
-            RandShiftIntensityd(
-                keys=["image"],
-                offsets=0.10,
-                prob=0.50,
-            ),
-            ToTensord(keys=["image", "label"]),
+            # data-augmentation
+            # NOTE: the following transforms are based on contrast-agnostic data augmentation:
+            # https://github.com/ivadomed/model-seg-dcm/blob/nk/dcm-zurich-pretraining/monai/transforms.py
+            RandAffined(keys=["image", "label"], mode=(2, 1), prob=0.9,
+                        rotate_range=(-20. / 360 * 2. * np.pi, 20. / 360 * 2. * np.pi),
+                        # monai expects in radians
+                        scale_range=(-0.2, 0.2),
+                        translate_range=(-0.1, 0.1)),
+            Rand3DElasticd(keys=["image", "label"], prob=0.5,
+                           sigma_range=(3.5, 5.5),
+                           magnitude_range=(25., 35.)),
+            RandSimulateLowResolutiond(keys=["image"], zoom_range=(0.5, 1.0), prob=0.25),
+            RandAdjustContrastd(keys=["image"], gamma=(0.5, 3.), prob=0.5),  # this is monai's RandomGamma
+            RandBiasFieldd(keys=["image"], coeff_range=(0.0, 0.5), degree=3, prob=0.3),
+            RandGaussianNoised(keys=["image"], mean=0.0, std=0.1, prob=0.1),
+            RandGaussianSmoothd(keys=["image"], sigma_x=(0., 2.), sigma_y=(0., 2.), sigma_z=(0., 2.0),
+                                prob=0.3),
+            RandScaleIntensityd(keys=["image"], factors=(-0.25, 1), prob=0.15),
+            # this is nnUNet's BrightnessMultiplicativeTransform
+            RandFlipd(keys=["image", "label"], prob=0.3, ),
         ]
     )
 
