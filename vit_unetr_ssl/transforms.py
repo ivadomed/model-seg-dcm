@@ -94,7 +94,7 @@ def define_pretrain_transforms(spatial_size, roi_size):
     return transforms
 
 
-def define_finetune_train_transforms(crop_size):
+def define_finetune_train_transforms(spatial_size):
     """
     Define MONAI Transforms for Training of the fine-tuned model
     """
@@ -114,12 +114,12 @@ def define_finetune_train_transforms(crop_size):
             # Remove background pixels to focus on regions of interest.
             CropForegroundd(keys=["image", "label"], source_key="image"),
             # Pad the image to a specified spatial size if its size is smaller than the specified dimensions
-            ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=crop_size),
+            ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
             # Randomly crop samples of a specified size
             RandCropByPosNegLabeld(
                 keys=["image", "label"],
                 label_key="label",
-                spatial_size=crop_size,
+                spatial_size=spatial_size,
                 pos=1,
                 neg=1,
                 num_samples=4,
@@ -160,7 +160,7 @@ def define_finetune_train_transforms(crop_size):
     return train_transforms
 
 
-def define_finetune_val_transforms(crop_size):
+def define_finetune_val_transforms(spatial_size):
     """
     Define MONAI Transforms for Validation of the fine-tuned model
     """
@@ -180,7 +180,7 @@ def define_finetune_val_transforms(crop_size):
             # Remove background pixels to focus on regions of interest.
             CropForegroundd(keys=["image", "label"], source_key="image"),
             # Pad the image to a specified spatial size if its size is smaller than the specified dimensions
-            ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=crop_size),
+            ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
             ToTensord(keys=["image", "label"])
         ]
     )
