@@ -51,10 +51,19 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
             # Remove background pixels to focus on regions of interest.
             # CropForegroundd(keys=["image"], source_key="image"),
             # Pad the image to a specified spatial size if its size is smaller than the specified dimensions
-            ResizeWithPadOrCropd(keys=["image"], spatial_size=spatial_size),
-            # Randomly crop samples of a specified size
-            RandSpatialCropSamplesd(keys=["image"], roi_size=roi_size, random_size=False, num_samples=2),
             ResizeWithPadOrCropd(keys=keys, spatial_size=spatial_size),
+            AsDiscreted(keys='label', to_onehot=None, threshold=0.5),
+            # Randomly crop samples of a specified size around the label (spinal cord)
+            RandCropByPosNegLabeld(
+                keys=keys,
+                label_key="label",
+                spatial_size=roi_size,
+                pos=2,
+                neg=1,
+                num_samples=2,
+                image_key="image",
+                image_threshold=0,
+            ),
             # Create copies of items in the dictionary under new keys, allowing for the same image to be manipulated
             # differently in subsequent transformations
             CopyItemsd(keys=["image"], times=2, names=["gt_image", "image_2"], allow_missing_keys=False),
