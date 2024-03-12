@@ -6,6 +6,7 @@ from monai.transforms import (
     CropForegroundd,
     CopyItemsd,
     ResizeWithPadOrCropd,
+    AsDiscreted,
     RandCropByPosNegLabeld,
     EnsureChannelFirstd,
     Orientationd,
