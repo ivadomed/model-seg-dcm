@@ -75,13 +75,21 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     # 'dropout_holes=True': the dropped regions will be set to zero, introducing regions of no
                     # information within the image.
                     RandCoarseDropoutd(
-                        keys=["image"], prob=1.0, holes=6, spatial_size=(10, 20, 20), dropout_holes=True,
-                        max_spatial_size=(spatial_size[0] / 4, spatial_size[1] / 4, spatial_size[2] / 4)
+                        keys=["image"],
+                        prob=1.0,
+                        holes=10,
+                        spatial_size=roi_size[0] // 4,
+                        dropout_holes=True,
+                        # max_spatial_size=(roi_size[0]//4, roi_size[1]//4, roi_size[2]//4)
                     ),
                     # 'dropout_holes=False': the areas inside the holes will be filled with random noise
                     RandCoarseDropoutd(
-                        keys=["image"], prob=1.0, holes=6, spatial_size=(30, 60, 60), dropout_holes=False,
-                        max_spatial_size=(spatial_size[0] / 2, spatial_size[1] / 2, spatial_size[2] / 2)
+                        keys=["image"],
+                        prob=1.0,
+                        holes=10,
+                        spatial_size=roi_size[0] // 2,
+                        dropout_holes=False,
+                        # max_spatial_size=(roi_size[0]//2, roi_size[1]//2, roi_size[2]//2)
                     ),
                 ]
             ),
@@ -98,13 +106,21 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     # 'dropout_holes=True': the dropped regions will be set to zero, introducing regions of no
                     # information within the image.
                     RandCoarseDropoutd(
-                        keys=["image_2"], prob=1.0, holes=6, spatial_size=(10, 20, 20), dropout_holes=True,
-                        max_spatial_size=(spatial_size[0] / 4, spatial_size[1] / 4, spatial_size[2] / 4)
+                        keys=["image_2"],
+                        prob=1.0,
+                        holes=10,
+                        spatial_size=roi_size[0] // 4,
+                        dropout_holes=True,
+                        # max_spatial_size=(roi_size[0]//4, roi_size[1]//4, roi_size[2]//4)
                     ),
                     # 'dropout_holes=False': the areas inside the holes will be filled with random noise
                     RandCoarseDropoutd(
-                        keys=["image_2"], prob=1.0, holes=6, spatial_size=(30, 60, 60), dropout_holes=False,
-                        max_spatial_size=(spatial_size[0] / 2, spatial_size[1] / 2, spatial_size[2] / 2)
+                        keys=["image_2"],
+                        prob=1.0,
+                        holes=10,
+                        spatial_size=roi_size[0] // 2,
+                        dropout_holes=False,
+                        # max_spatial_size=(roi_size[0]//2, roi_size[1]//2, roi_size[2]//2)
                     ),
                 ]
             ),
