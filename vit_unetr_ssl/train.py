@@ -123,7 +123,7 @@ def main():
     # Create dataloaders for training
     # -----------------------------------------------------
 
-    NUM_WORKERS = 4
+    NUM_WORKERS = 0
 
     train_dataset = CacheDataset(data=train_list, transform=transforms, cache_rate=0.5, num_workers=NUM_WORKERS)
     val_dataset = CacheDataset(data=val_list, transform=transforms, cache_rate=0.25, num_workers=NUM_WORKERS)
@@ -131,13 +131,13 @@ def main():
                               batch_size=batch_size,
                               shuffle=True,
                               num_workers=NUM_WORKERS,
-                              pin_memory=True,
+                              pin_memory=False,
                               persistent_workers=False)
     val_loader = DataLoader(val_dataset,
                             batch_size=batch_size,
                             shuffle=True,
                             num_workers=NUM_WORKERS,
-                            pin_memory=True,
+                            pin_memory=False,
                             persistent_workers=False)
 
     # -----------------------------------------------------
