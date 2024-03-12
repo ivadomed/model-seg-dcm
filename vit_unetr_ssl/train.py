@@ -106,7 +106,7 @@ def main():
     # Define Hyper-paramters for training loop
     max_epochs = 500
     val_interval = 2
-    batch_size = 2
+    batch_size = 4
     lr = 1e-4
     epoch_loss_values = []
     step_loss_values = []
@@ -123,7 +123,7 @@ def main():
     # Create dataloaders for training
     # -----------------------------------------------------
 
-    NUM_WORKERS = 0
+    NUM_WORKERS = 4
 
     train_dataset = CacheDataset(data=train_list, transform=transforms, cache_rate=0.5, num_workers=NUM_WORKERS)
     val_dataset = CacheDataset(data=val_list, transform=transforms, cache_rate=0.25, num_workers=NUM_WORKERS)
