@@ -33,7 +33,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description='Run Self-Supervised Pre-training.')
     parser.add_argument('--dataset-split', required=True, type=str,
                         help='Path to the JSON file with train/val split.')
-    parser.add_argument('--data', required=True, type=str,
+    parser.add_argument('--data', required=False, type=str, default="",
                         help='Path to the dataset root directory.')
     parser.add_argument('--logdir', required=True, type=str,
                         help='Path to the directory for logging.')
