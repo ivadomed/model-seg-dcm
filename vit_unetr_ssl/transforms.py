@@ -93,8 +93,8 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     ),
                 ]
             ),
-            # Randomly shuffle blocks within the image
-            RandCoarseShuffled(keys=["image"], prob=0.8, holes=10, spatial_size=8),
+            # Randomly select regions in the image, then shuffle the pixels within every region
+            RandCoarseShuffled(keys=["image"], prob=0.8, holes=10, spatial_size=roi_size[2] // 4),
 
             # AUGMENTED VIEW 2
             # Please note that that if image and image_2 are called via the same transform call because of the
@@ -124,7 +124,8 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     ),
                 ]
             ),
-            RandCoarseShuffled(keys=["image_2"], prob=0.8, holes=10, spatial_size=8),
+            # Randomly select regions in the image, then shuffle the pixels within every region
+            RandCoarseShuffled(keys=["image_2"], prob=0.8, holes=10, spatial_size=roi_size[2] // 4),
         ]
     )
 
