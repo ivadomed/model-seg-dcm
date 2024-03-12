@@ -73,6 +73,8 @@ def main():
     #ROI_SIZE = (64, 64, 64)
     ROI_SIZE = SPATIAL_SIZE
     transforms = define_pretrain_transforms(spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
+    keys = ["image", "label"]
+    transforms = define_pretrain_transforms(keys=keys, spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
 
     # -----------------------------------------------------
     # Sanity Check for the transforms

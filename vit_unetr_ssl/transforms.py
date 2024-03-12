@@ -28,21 +28,24 @@ from monai.transforms import (
 )
 
 
-def define_pretrain_transforms(spatial_size, roi_size):
+def define_pretrain_transforms(keys, spatial_size, roi_size):
     """
     Define MONAI Transforms for Training/Validation of the self-supervised pretrained model
+    :args: keys: list of keys to be used for the transforms, e.g. ["image", "label"]
+    :args: spatial_size: spatial size of the input image, e.g. (64, 256, 256)
+    :args: roi_size: spatial size of the region of interest, e.g. (64, 64, 64)
     """
     transforms = Compose(
         [
             # Load image data using the key "image"
-            LoadImaged(keys=["image"], image_only=True),
+            LoadImaged(keys=keys, image_only=True),
             # Ensure that the channel dimension is the first dimension of the image tensor.
-            EnsureChannelFirstd(keys=["image"]),
+            EnsureChannelFirstd(keys=keys),
             # Ensure that the image orientation is consistently RPI
-            Orientationd(keys=["image"], axcodes="RPI"),
+            Orientationd(keys=keys, axcodes="RPI"),
             # Resample the images to a specified pixel spacing
             # NOTE: spine interpolation with order=2 is spline, order=1 is linear
-            Spacingd(keys=["image"], pixdim=(1.0, 1.0, 1.0), mode=2),
+            Spacingd(keys=keys, pixdim=(1.0, 1.0, 1.0), mode=(2, 1)),
             # Normalize the intensity values of the image
             NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             # Remove background pixels to focus on regions of interest.
@@ -51,6 +54,7 @@ def define_pretrain_transforms(spatial_size, roi_size):
             ResizeWithPadOrCropd(keys=["image"], spatial_size=spatial_size),
             # Randomly crop samples of a specified size
             RandSpatialCropSamplesd(keys=["image"], roi_size=roi_size, random_size=False, num_samples=2),
+            ResizeWithPadOrCropd(keys=keys, spatial_size=spatial_size),
             # Create copies of items in the dictionary under new keys, allowing for the same image to be manipulated
             # differently in subsequent transformations
             CopyItemsd(keys=["image"], times=2, names=["gt_image", "image_2"], allow_missing_keys=False),
