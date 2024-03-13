@@ -95,11 +95,12 @@ def main():
     # -----------------------------------------------------
 
     # Define Network ViT backbone & Loss & Optimizer
+    patch_size = (16, 16, 16)
     device = torch.device("cuda:0")
     model = ViTAutoEnc(
         in_channels=1,
         img_size=ROI_SIZE,
-        patch_size=(16, 16, 16),
+        patch_size=patch_size,
         pos_embed="conv",
         hidden_size=768,
         mlp_dim=3072,
@@ -122,6 +123,16 @@ def main():
     recon_loss = L1Loss()
     contrastive_loss = ContrastiveLoss(temperature=0.05)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    # ------------------------------------------------------
+    # Print hyper-parameters into the log file
+    # ------------------------------------------------------
+    logger.info(f"img_size: {ROI_SIZE}")
+    logger.info(f"patch_size: {patch_size}")
+    logger.info(f"max_epochs: {max_epochs}")
+    logger.info(f"val_interval: {val_interval}")
+    logger.info(f"batch_size: {batch_size}")
+    logger.info(f"lr: {lr}")
 
     # -----------------------------------------------------
     # Create dataloaders for training
