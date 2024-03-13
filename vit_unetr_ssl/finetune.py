@@ -39,7 +39,10 @@ def get_parser():
     # parse command line arguments
     parser = argparse.ArgumentParser(description='Run Fine-tuning.')
     parser.add_argument('--dataset-split', required=True, type=str,
-                        help='Path to the JSON file with train/val split.')
+                        help='Path to the JSON file with training/validation split. '
+                             'If paths are absolute, you do NOT need to use --data. '
+                             'If only filenames are provided, you need to use --data to specify the root directory '
+                             'of the dataset.')
     parser.add_argument('--data', required=False, type=str, default="",
                         help='Path to the dataset root directory. If not provided, path to data specified in the JSON '
                              'file will be used.')
