@@ -41,6 +41,7 @@ def get_parser():
                              'file will be used.')
     parser.add_argument('--logdir', required=True, type=str,
                         help='Path to the directory for logging.')
+    parser.add_argument('--cuda', type=int, default=0, help='Index of the CUDA device to use.')
 
     return parser
 
@@ -96,7 +97,7 @@ def main():
 
     # Define Network ViT backbone & Loss & Optimizer
     patch_size = (16, 16, 16)
-    device = torch.device("cuda:0")
+    device = torch.device(f"cuda:{args.cuda}")
     model = ViTAutoEnc(
         in_channels=1,
         img_size=ROI_SIZE,
