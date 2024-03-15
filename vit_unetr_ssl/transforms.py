@@ -55,6 +55,10 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
             ResizeWithPadOrCropd(keys=keys, spatial_size=spatial_size),
             AsDiscreted(keys='label', to_onehot=None, threshold=0.5),
             # Randomly crop samples of a specified size around the label (spinal cord)
+            # Note that it seems that the transform randomly selects a foreground point from image, then use it as
+            # center crop. This means that it can find the closest voxel that is just outside the SC and use it as the
+            # center (hence it includes the SC)
+            # https://github.com/Project-MONAI/MONAI/issues/452#issuecomment-636065502
             RandCropByPosNegLabeld(
                 keys=keys,
                 label_key="label",
