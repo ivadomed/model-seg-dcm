@@ -26,6 +26,10 @@ from monai.data import (
 
 from transforms import define_pretrain_transforms
 from load_data import load_data
+# Added this to solve problem with too many files open allowing number of workers > 0
+# https://github.com/pytorch/pytorch/issues/11201#issuecomment-421146936
+import torch.multiprocessing
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 
 def get_parser():
@@ -139,7 +143,7 @@ def main():
     # Create dataloaders for training
     # -----------------------------------------------------
 
-    NUM_WORKERS = 0
+    NUM_WORKERS = 4
 
     train_dataset = CacheDataset(data=train_list, transform=transforms, cache_rate=0.5, num_workers=NUM_WORKERS)
     val_dataset = CacheDataset(data=val_list, transform=transforms, cache_rate=0.25, num_workers=NUM_WORKERS)
