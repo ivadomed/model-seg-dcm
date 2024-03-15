@@ -161,6 +161,7 @@ def main():
     # -----------------------------------------------------
 
     for epoch in range(max_epochs):
+        start_time_epoch = time.time()
         logger.info("-" * 10)
         logger.info(f"epoch {epoch + 1}/{max_epochs}")
         model.train()
@@ -217,6 +218,8 @@ def main():
         epoch_cl_loss_values.append(epoch_cl_loss)
         epoch_recon_loss_values.append(epoch_recon_loss)
         logger.info(f"epoch {epoch + 1} average loss: {epoch_loss:.4f}")
+        end_time_epoch = time.time()
+        logger.info(f"epoch {epoch + 1} time taken: {end_time_epoch-start_time_epoch}s")
 
         if epoch % val_interval == 0:
             logger.info("Entering Validation for epoch: {}".format(epoch + 1))
