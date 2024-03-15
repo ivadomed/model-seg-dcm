@@ -221,6 +221,7 @@ def main():
         end_time_epoch = time.time()
         logger.info(f"epoch {epoch + 1} time taken: {end_time_epoch-start_time_epoch}s")
 
+        # Validation every 2 epochs
         if epoch % val_interval == 0:
             logger.info("Entering Validation for epoch: {}".format(epoch + 1))
             total_val_loss = 0
