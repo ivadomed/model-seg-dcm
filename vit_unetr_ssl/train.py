@@ -239,6 +239,24 @@ def main():
                 total_val_loss += val_loss.item()
                 end_time = time.time()
 
+                if val_step == 1:
+                    # Plot and save input and output validation images to see how the model is learning
+                    plt.figure(1, figsize=(8, 8))
+                    plt.subplot(2, 2, 1)
+                    plt.imshow(inputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Input Image")
+                    plt.subplot(2, 2, 2)
+                    plt.imshow(gt_input[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Ground Truth Image")
+                    plt.subplot(2, 2, 3)
+                    plt.imshow(outputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Output Image")
+                    plt.subplot(2, 2, 4)
+                    plt.imshow(outputs_v2[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Output Image 2")
+                    plt.savefig(os.path.join(logdir_path, f"epoch_{epoch + 1}_val_{val_step}_images.png"))
+                    plt.close(1)
+
             total_val_loss /= val_step
             val_loss_values.append(total_val_loss)
             logger.info(f"epoch {epoch + 1} Validation avg loss: {total_val_loss:.4f}, " f"time taken: {end_time-start_time}s")
