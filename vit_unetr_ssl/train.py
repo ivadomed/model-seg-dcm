@@ -250,6 +250,9 @@ def main():
                 total_val_loss += val_loss.item()
                 end_time = time.time()
 
+                # Create validation_figures directory if it does not exist
+                if not os.path.exists(os.path.join(logdir_path, "validation_figures")):
+                    os.mkdir(os.path.join(logdir_path, "validation_figures"))
                 if val_step == 1:
                     # Plot and save input and output validation images to see how the model is learning
                     plt.figure(1, figsize=(8, 8))
@@ -264,7 +267,8 @@ def main():
                     plt.title("Output Image")
                     # Include the epoch number as master title
                     plt.suptitle(f"Epoch {epoch + 1}")
-                    fname = os.path.join(logdir_path, f"epoch_{epoch + 1}_val_{val_step}_images.png")
+                    fname = os.path.join(logdir_path, "validation_figures",
+                                         f"epoch_{epoch + 1}_val_{val_step}_images.png")
                     plt.savefig(fname)
                     plt.close(1)
                     logger.info(f"Saved validation images to {fname}")
