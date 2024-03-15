@@ -267,8 +267,8 @@ def main():
                     plt.title("Output Image")
                     # Include the epoch number as master title
                     plt.suptitle(f"Epoch {epoch + 1}")
-                    fname = os.path.join(logdir_path, "validation_figures",
-                                         f"epoch_{epoch + 1}_val_{val_step}_images.png")
+                    # Use 3 leading zeros for the epoch number
+                    fname = os.path.join(logdir_path, "validation_figures", f"epoch_{epoch + 1:03d}_val_{val_step}.png")
                     plt.savefig(fname)
                     plt.close(1)
                     logger.info(f"Saved validation images to {fname}")
