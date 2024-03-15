@@ -235,6 +235,12 @@ def main():
                     val_batch["gt_image"].to(device),
                 )
                 logger.info("Input shape: {}".format(inputs.shape))
+                # Call forward pass of the model with the inputs
+                # The model returns the output and the hidden states
+                #   1. outputs:  This is the reconstructed image from the model. It should have the same dimensions as
+                # the input image.
+                #   2. outputs_v2: This is the hidden representation of the input image, which is the output of the
+                # transformer encoder. It's a high-dimensional feature representation of the input.
                 outputs, outputs_v2 = model(inputs)
                 val_loss = recon_loss(outputs, gt_input)
                 total_val_loss += val_loss.item()
@@ -252,9 +258,6 @@ def main():
                     plt.subplot(2, 2, 3)
                     plt.imshow(outputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
                     plt.title("Output Image")
-                    plt.subplot(2, 2, 4)
-                    plt.imshow(outputs_v2[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
-                    plt.title("Output Image 2")
                     plt.savefig(os.path.join(logdir_path, f"epoch_{epoch + 1}_val_{val_step}_images.png"))
                     plt.close(1)
 
