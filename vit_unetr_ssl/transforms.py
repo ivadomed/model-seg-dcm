@@ -29,12 +29,13 @@ from monai.transforms import (
 )
 
 
-def define_pretrain_transforms(keys, spatial_size, roi_size):
+def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=10):
     """
     Define MONAI Transforms for Training/Validation of the self-supervised pretrained model
     :args: keys: list of keys to be used for the transforms, e.g. ["image", "label"]
     :args: spatial_size: spatial size of the input image, e.g. (64, 256, 256)
     :args: roi_size: spatial size of the region of interest, e.g. (64, 64, 64)
+    :args: number_of_holes: number of holes to be used for the RandCoarseDropoutd and RandCoarseShuffled transforms
     """
     transforms = Compose(
         [
@@ -82,7 +83,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     RandCoarseDropoutd(
                         keys=["image"],
                         prob=1.0,
-                        holes=10,
+                        holes=number_of_holes,
                         spatial_size=roi_size[0] // 4,
                         dropout_holes=True,
                         # max_spatial_size=(roi_size[0]//4, roi_size[1]//4, roi_size[2]//4)
@@ -91,7 +92,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     RandCoarseDropoutd(
                         keys=["image"],
                         prob=1.0,
-                        holes=10,
+                        holes=number_of_holes,
                         spatial_size=roi_size[0] // 2,
                         dropout_holes=False,
                         # max_spatial_size=(roi_size[0]//2, roi_size[1]//2, roi_size[2]//2)
@@ -99,7 +100,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                 ]
             ),
             # Randomly select regions in the image, then shuffle the pixels within every region
-            RandCoarseShuffled(keys=["image"], prob=0.8, holes=10, spatial_size=roi_size[2] // 4),
+            RandCoarseShuffled(keys=["image"], prob=0.8, holes=number_of_holes, spatial_size=roi_size[2] // 4),
 
             # AUGMENTED VIEW 2
             # Please note that that if image and image_2 are called via the same transform call because of the
@@ -113,7 +114,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     RandCoarseDropoutd(
                         keys=["image_2"],
                         prob=1.0,
-                        holes=10,
+                        holes=number_of_holes,
                         spatial_size=roi_size[0] // 4,
                         dropout_holes=True,
                         # max_spatial_size=(roi_size[0]//4, roi_size[1]//4, roi_size[2]//4)
@@ -122,7 +123,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                     RandCoarseDropoutd(
                         keys=["image_2"],
                         prob=1.0,
-                        holes=10,
+                        holes=number_of_holes,
                         spatial_size=roi_size[0] // 2,
                         dropout_holes=False,
                         # max_spatial_size=(roi_size[0]//2, roi_size[1]//2, roi_size[2]//2)
@@ -130,7 +131,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size):
                 ]
             ),
             # Randomly select regions in the image, then shuffle the pixels within every region
-            RandCoarseShuffled(keys=["image_2"], prob=0.8, holes=10, spatial_size=roi_size[2] // 4),
+            RandCoarseShuffled(keys=["image_2"], prob=0.8, holes=number_of_holes, spatial_size=roi_size[2] // 4),
         ]
     )
 
