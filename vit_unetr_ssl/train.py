@@ -258,8 +258,12 @@ def main():
                     plt.subplot(2, 2, 3)
                     plt.imshow(outputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
                     plt.title("Output Image")
-                    plt.savefig(os.path.join(logdir_path, f"epoch_{epoch + 1}_val_{val_step}_images.png"))
+                    # Include the epoch number as master title
+                    plt.suptitle(f"Epoch {epoch + 1}")
+                    fname = os.path.join(logdir_path, f"epoch_{epoch + 1}_val_{val_step}_images.png")
+                    plt.savefig(fname)
                     plt.close(1)
+                    logger.info(f"Saved validation images to {fname}")
 
             total_val_loss /= val_step
             val_loss_values.append(total_val_loss)
