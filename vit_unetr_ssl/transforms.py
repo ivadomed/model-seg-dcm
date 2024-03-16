@@ -29,7 +29,7 @@ from monai.transforms import (
 )
 
 
-def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=10):
+def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
     """
     Define MONAI Transforms for Training/Validation of the self-supervised pretrained model
     :args: keys: list of keys to be used for the transforms, e.g. ["image", "label"]
