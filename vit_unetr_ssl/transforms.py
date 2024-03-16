@@ -13,17 +13,13 @@ from monai.transforms import (
     Spacingd,
     OneOf,
     NormalizeIntensityd,
-    RandSpatialCropSamplesd,
     RandCoarseDropoutd,
     RandCoarseShuffled,
     RandFlipd,
-    RandScaleIntensityd,
-    RandGaussianNoised,
     RandGaussianSmoothd,
     RandBiasFieldd,
     RandAdjustContrastd,
     RandSimulateLowResolutiond,
-    Rand3DElasticd,
     RandAffined,
     ToTensord
 )
@@ -171,8 +167,7 @@ def define_finetune_train_transforms(spatial_size):
                 image_threshold=0,
             ),
             # data-augmentation
-            # NOTE: the following transforms are based on contrast-agnostic data augmentation:
-            # https://github.com/ivadomed/model-seg-dcm/blob/nk/dcm-zurich-pretraining/monai/transforms.py
+            # Note: we use simple transforms suitable for lesion seg
             RandAffined(keys=["image", "label"], mode=(2, 1), prob=0.1,
                         rotate_range=(-20. / 360 * 2. * np.pi, 20. / 360 * 2. * np.pi),
                         # monai expects in radians
