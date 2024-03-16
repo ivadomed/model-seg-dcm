@@ -114,7 +114,7 @@ def main():
 
     model = model.to(device)
 
-    # Define Hyper-paramters for training loop
+    # Define Hyper-parameters for training loop
     max_epochs = 500
     val_interval = 2
     batch_size = 4
