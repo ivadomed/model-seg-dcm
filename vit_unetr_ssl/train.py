@@ -117,7 +117,7 @@ def main():
     # Define Hyper-parameters for training loop
     max_epochs = 500
     val_interval = 2
-    batch_size = 4
+    batch_size = 8
     lr = 1e-4
     epoch_loss_values = []
     step_loss_values = []
