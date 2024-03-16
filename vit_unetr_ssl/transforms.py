@@ -173,23 +173,17 @@ def define_finetune_train_transforms(spatial_size):
             # data-augmentation
             # NOTE: the following transforms are based on contrast-agnostic data augmentation:
             # https://github.com/ivadomed/model-seg-dcm/blob/nk/dcm-zurich-pretraining/monai/transforms.py
-            RandAffined(keys=["image", "label"], mode=(2, 1), prob=0.9,
+            RandAffined(keys=["image", "label"], mode=(2, 1), prob=0.1,
                         rotate_range=(-20. / 360 * 2. * np.pi, 20. / 360 * 2. * np.pi),
                         # monai expects in radians
                         scale_range=(-0.2, 0.2),
                         translate_range=(-0.1, 0.1)),
-            Rand3DElasticd(keys=["image", "label"], prob=0.5,
-                           sigma_range=(3.5, 5.5),
-                           magnitude_range=(25., 35.)),
-            RandSimulateLowResolutiond(keys=["image"], zoom_range=(0.5, 1.0), prob=0.25),
-            RandAdjustContrastd(keys=["image"], gamma=(0.5, 3.), prob=0.5),  # this is monai's RandomGamma
-            RandBiasFieldd(keys=["image"], coeff_range=(0.0, 0.5), degree=3, prob=0.3),
-            RandGaussianNoised(keys=["image"], mean=0.0, std=0.1, prob=0.1),
+            RandSimulateLowResolutiond(keys=["image"], zoom_range=(0.5, 1.0), prob=0.2),
+            RandAdjustContrastd(keys=["image"], gamma=(0.5, 3.), prob=0.2),  # this is monai's RandomGamma
+            RandBiasFieldd(keys=["image"], coeff_range=(0.0, 0.5), degree=3, prob=0.1),
             RandGaussianSmoothd(keys=["image"], sigma_x=(0., 2.), sigma_y=(0., 2.), sigma_z=(0., 2.0),
-                                prob=0.3),
-            RandScaleIntensityd(keys=["image"], factors=(-0.25, 1), prob=0.15),
-            # this is nnUNet's BrightnessMultiplicativeTransform
-            RandFlipd(keys=["image", "label"], prob=0.3, ),
+                                prob=0.2),
+            RandFlipd(keys=["image", "label"], prob=0.2, ),
         ]
     )
 
