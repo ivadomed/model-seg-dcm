@@ -74,14 +74,12 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
             OneOf(
                 transforms=[
                     # Randomly drop regions of the image
-                    # 'dropout_holes=True': the dropped regions will be set to zero, introducing regions of no
-                    # information within the image.
                     RandCoarseDropoutd(
                         keys=["image"],
                         prob=1.0,
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 4,
-                        dropout_holes=True,
+                        dropout_holes=True,     # if True, dropout the regions of holes and fill value specified by 'fill_value'
                         # max_spatial_size=(roi_size[0]//4, roi_size[1]//4, roi_size[2]//4)
                     ),
                     # 'dropout_holes=False': the areas inside the holes will be filled with random noise
@@ -90,7 +88,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
                         prob=1.0,
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 2,
-                        dropout_holes=False,
+                        dropout_holes=False,    # if False, keep the holes and dropout the outside and fill value specified by 'fill_value'
                         # max_spatial_size=(roi_size[0]//2, roi_size[1]//2, roi_size[2]//2)
                     ),
                 ]
@@ -105,14 +103,12 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
             OneOf(
                 transforms=[
                     # Randomly drop regions of the image
-                    # 'dropout_holes=True': the dropped regions will be set to zero, introducing regions of no
-                    # information within the image.
                     RandCoarseDropoutd(
                         keys=["image_2"],
                         prob=1.0,
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 4,
-                        dropout_holes=True,
+                        dropout_holes=True,     # if True, dropout the regions of holes and fill value specified by 'fill_value'
                         # max_spatial_size=(roi_size[0]//4, roi_size[1]//4, roi_size[2]//4)
                     ),
                     # 'dropout_holes=False': the areas inside the holes will be filled with random noise
@@ -121,7 +117,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
                         prob=1.0,
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 2,
-                        dropout_holes=False,
+                        dropout_holes=False,    # if False, keep the holes and dropout the outside and fill value specified by 'fill_value'
                         # max_spatial_size=(roi_size[0]//2, roi_size[1]//2, roi_size[2]//2)
                     ),
                 ]
