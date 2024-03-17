@@ -80,6 +80,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 4,
                         dropout_holes=True,     # if True, dropout the regions of holes and fill value specified by 'fill_value'
+                        fill_value=0,   # fill value for the dropped regions
                     ),
                     # 'dropout_holes=False': the areas inside the holes will be filled with random noise
                     RandCoarseDropoutd(
@@ -88,6 +89,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 2,
                         dropout_holes=False,    # if False, keep the holes and dropout the outside and fill value specified by 'fill_value'
+                        fill_value=0,  # fill value for the dropped regions
                     ),
                 ]
             ),
@@ -107,6 +109,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 4,
                         dropout_holes=True,     # if True, dropout the regions of holes and fill value specified by 'fill_value'
+                        fill_value=0,  # fill value for the dropped regions
                     ),
                     # 'dropout_holes=False': the areas inside the holes will be filled with random noise
                     RandCoarseDropoutd(
@@ -115,6 +118,7 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
                         holes=number_of_holes,
                         spatial_size=roi_size[0] // 2,
                         dropout_holes=False,    # if False, keep the holes and dropout the outside and fill value specified by 'fill_value'
+                        fill_value=0,  # fill value for the dropped regions
                     ),
                 ]
             ),
