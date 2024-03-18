@@ -118,6 +118,7 @@ def main():
     max_epochs = 500
     val_interval = 2
     # Note: the batch size is actually doubled (8*2=16), because we are using two augmented samples per 3D Volume
+    # TODO: increase it to 16
     batch_size = 8
     lr = 1e-4
     epoch_loss_values = []
