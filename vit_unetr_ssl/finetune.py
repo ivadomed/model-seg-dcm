@@ -34,6 +34,12 @@ from monai.data import (
 from load_data import load_data
 from transforms import define_finetune_train_transforms, define_finetune_val_transforms
 
+# Added this to solve problem with too many files open allowing number of workers > 0
+# https://github.com/pytorch/pytorch/issues/11201#issuecomment-421146936
+# https://github.com/ivadomed/model-seg-dcm/issues/8
+import torch.multiprocessing
+torch.multiprocessing.set_sharing_strategy('file_system')
+
 
 def get_parser():
     # parse command line arguments
