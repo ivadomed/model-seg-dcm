@@ -193,6 +193,11 @@ def main():
     # -----------------------------------------------------
     # Training Loop with Validation
     # -----------------------------------------------------
+
+    # Create validation_figures directory if it does not exist
+    if not os.path.exists(os.path.join(logdir_path, "validation_figures")):
+        os.mkdir(os.path.join(logdir_path, "validation_figures"))
+
     def validation(epoch_iterator_val):
         model.eval()
         dice_vals = []
@@ -208,28 +213,29 @@ def main():
                 dice_vals.append(dice)
                 epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, 10.0, dice))
 
-                # Create validation_figures directory if it does not exist
-                if not os.path.exists(os.path.join(logdir_path, "validation_figures")):
-                    os.mkdir(os.path.join(logdir_path, "validation_figures"))
-                if _step == 1:
+                # Check whether val_labels is not empty (i.e., contains a lesion)
+                if val_labels[0, 0, :, :, :].sum() > 0:
+                    logger.info(f"Lesion found in the validation image. Saving the validation images.")
+                    # if so, get corresponding slice
+                    slice_idx = val_labels[0, 0, :, :, :].nonzero()[:, 2].mean().int().item()
                     # Plot and save input and output validation images to see how the model is learning
                     plt.figure(1, figsize=(8, 8))
                     plt.subplot(2, 2, 1)
-                    logger.info(f'Input image shape: {val_inputs[0, 0, :, :, 32].detach().cpu().numpy().shape}')
-                    plt.imshow(val_inputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    logger.info(f'Input image shape: {val_inputs.detach().cpu().numpy().shape}')
+                    plt.imshow(val_inputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
                     plt.title("Input Image")
                     plt.subplot(2, 2, 2)
-                    logger.info(f'Ground truth shape: {val_labels[0, 0, :, :, 32].detach().cpu().numpy().shape}')
-                    plt.imshow(val_labels[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    logger.info(f'Ground truth shape: {val_labels.detach().cpu().numpy().shape}')
+                    plt.imshow(val_labels[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
                     plt.title("Ground Truth")
                     plt.subplot(2, 2, 3)
-                    logger.info(f'Predicted shape: {val_outputs[0, 0, :, :, 32].detach().cpu().numpy().shape}')
-                    plt.imshow(val_outputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    logger.info(f'Predicted shape: {val_outputs.detach().cpu().numpy().shape}')
+                    plt.imshow(val_outputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
                     plt.title("Predicted")
                     # Include the global_step as master title
                     plt.suptitle(f"Validation Step: {global_step}")
                     # Use 5 leading zeros for the global_step
-                    fname = os.path.join(logdir_path, "validation_figures", f"val_{global_step:05d}.png")
+                    fname = os.path.join(logdir_path, "validation_figures", f"val_{global_step:05d}_{_step}.png")
                     plt.savefig(fname)
                     plt.close(1)
                     logger.info(f"Saved validation images to {fname}")
