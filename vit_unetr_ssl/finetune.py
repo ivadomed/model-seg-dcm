@@ -84,8 +84,12 @@ def main():
     # -----------------------------------------------------
     # Define MONAI Transforms
     # -----------------------------------------------------
-    SPATIAL_SIZE = (64, 256, 256)  # keeping the same image size as for pretraining
-    train_transforms = define_finetune_train_transforms(spatial_size=SPATIAL_SIZE)
+    # keeping the same image size as for pretraining
+    SPATIAL_SIZE = (64, 256, 256)
+    ROI_SIZE = (64, 64, 64)
+
+    # roi_size is used to crop samples around the spinal cord
+    train_transforms = define_finetune_train_transforms(spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
     val_transforms = define_finetune_val_transforms(spatial_size=SPATIAL_SIZE)
 
     # -----------------------------------------------------

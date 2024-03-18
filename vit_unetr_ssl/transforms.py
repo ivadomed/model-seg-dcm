@@ -130,9 +130,11 @@ def define_pretrain_transforms(keys, spatial_size, roi_size, number_of_holes=5):
     return transforms
 
 
-def define_finetune_train_transforms(spatial_size):
+def define_finetune_train_transforms(spatial_size, roi_size):
     """
     Define MONAI Transforms for Training of the fine-tuned model
+    :args: spatial_size: spatial size of the input image, e.g. (64, 256, 256)
+    :args: roi_size: spatial size of the region of interest, e.g. (64, 64, 64)
     """
     train_transforms = Compose(
         [
