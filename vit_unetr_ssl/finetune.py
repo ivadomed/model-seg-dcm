@@ -150,7 +150,7 @@ def main():
     lr = 1e-4
     max_iterations = 30000
     eval_num = 100
-    batch_size = 2
+    batch_size = 8
     loss_function = DiceCELoss()
     torch.backends.cudnn.benchmark = True
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-5)
