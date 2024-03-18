@@ -215,12 +215,15 @@ def main():
                     # Plot and save input and output validation images to see how the model is learning
                     plt.figure(1, figsize=(8, 8))
                     plt.subplot(2, 2, 1)
+                    logger.info(f'Input image shape: {val_inputs[0, 0, :, :, 32].detach().cpu().numpy().shape}')
                     plt.imshow(val_inputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
                     plt.title("Input Image")
                     plt.subplot(2, 2, 2)
+                    logger.info(f'Ground truth shape: {val_labels[0, 0, :, :, 32].detach().cpu().numpy().shape}')
                     plt.imshow(val_labels[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
                     plt.title("Ground Truth")
                     plt.subplot(2, 2, 3)
+                    logger.info(f'Predicted shape: {val_outputs[0, 0, :, :, 32].detach().cpu().numpy().shape}')
                     plt.imshow(val_outputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
                     plt.title("Predicted")
                     # Include the global_step as master title
