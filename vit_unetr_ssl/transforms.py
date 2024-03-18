@@ -139,34 +139,34 @@ def define_finetune_train_transforms(spatial_size, roi_size):
     train_transforms = Compose(
         [
             # Load image data and GT using the keys "image" and "label"
-            LoadImaged(keys=["image", "label"], image_only=False),
+            LoadImaged(keys=["image", "label_sc", "label_lesion"], image_only=False),
             # Ensure that the channel dimension is the first dimension of the image tensor.
-            EnsureChannelFirstd(keys=["image", "label"]),
+            EnsureChannelFirstd(keys=["image", "label_sc", "label_lesion"]),
             # Ensure that the image orientation is consistently RPI
-            Orientationd(keys=["image", "label"], axcodes="RPI"),
+            Orientationd(keys=["image", "label_sc", "label_lesion"], axcodes="RPI"),
             # Resample the images to a specified pixel spacing
             # NOTE: spine interpolation with order=2 is spline, order=1 is linear
-            Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=(2, 1)),
+            Spacingd(keys=["image", "label_sc", "label_lesion"], pixdim=(1.0, 1.0, 1.0), mode=(2, 1, 1)),
             # Normalize the intensity values of the image
             NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             # Remove background pixels to focus on regions of interest.
-            CropForegroundd(keys=["image", "label"], source_key="image"),
+            CropForegroundd(keys=["image", "label_sc", "label_lesion"], source_key="image"),
             # Pad the image to a specified spatial size if its size is smaller than the specified dimensions
-            ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
+            ResizeWithPadOrCropd(keys=["image", "label_sc", "label_lesion"], spatial_size=spatial_size),
             # Randomly crop samples of a specified size
             RandCropByPosNegLabeld(
-                keys=["image", "label"],
-                label_key="label",
-                spatial_size=spatial_size,
+                keys=["image", "label_sc", "label_lesion"],
+                label_key="label_sc",       # cropping around the SC
+                spatial_size=roi_size,
                 pos=1,
-                neg=1,
+                neg=0,
                 num_samples=4,  # if num_samples=4, then 4 samples/image are randomly generated
                 image_key="image",
                 image_threshold=0,
             ),
             # data-augmentation
             # Note: we use simple transforms suitable for lesion seg
-            RandAffined(keys=["image", "label"], mode=(2, 1), prob=0.1,
+            RandAffined(keys=["image", "label_lesion"], mode=(2, 1), prob=0.1,
                         rotate_range=(-20. / 360 * 2. * np.pi, 20. / 360 * 2. * np.pi),
                         # monai expects in radians
                         scale_range=(-0.2, 0.2),
@@ -176,7 +176,7 @@ def define_finetune_train_transforms(spatial_size, roi_size):
             RandBiasFieldd(keys=["image"], coeff_range=(0.0, 0.5), degree=3, prob=0.1),
             RandGaussianSmoothd(keys=["image"], sigma_x=(0., 2.), sigma_y=(0., 2.), sigma_z=(0., 2.0),
                                 prob=0.2),
-            RandFlipd(keys=["image", "label"], prob=0.2, ),
+            RandFlipd(keys=["image", "label_lesion"], prob=0.2),
         ]
     )
 
@@ -186,25 +186,25 @@ def define_finetune_train_transforms(spatial_size, roi_size):
 def define_finetune_val_transforms(spatial_size):
     """
     Define MONAI Transforms for Validation of the fine-tuned model
+    :args: spatial_size: spatial size of the input image, e.g. (64, 256, 256)
     """
     val_transforms = Compose(
         [
             # Load image data and GT using the keys "image" and "label"
-            LoadImaged(keys=["image", "label"], image_only=False),
+            LoadImaged(keys=["image", "label_sc", "label_lesion"], image_only=False),
             # Ensure that the channel dimension is the first dimension of the image tensor.
-            EnsureChannelFirstd(keys=["image", "label"]),
+            EnsureChannelFirstd(keys=["image", "label_sc", "label_lesion"]),
             # Ensure that the image orientation is consistently RPI
-            Orientationd(keys=["image", "label"], axcodes="RPI"),
+            Orientationd(keys=["image", "label_sc", "label_lesion"], axcodes="RPI"),
             # Resample the images to a specified pixel spacing
             # NOTE: spine interpolation with order=2 is spline, order=1 is linear
-            Spacingd(keys=["image", "label"], pixdim=(1.0, 1.0, 1.0), mode=(2, 1)),
+            Spacingd(keys=["image", "label_sc", "label_lesion"], pixdim=(1.0, 1.0, 1.0), mode=(2, 1, 1)),
             # Normalize the intensity values of the image
             NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             # Remove background pixels to focus on regions of interest.
-            CropForegroundd(keys=["image", "label"], source_key="image"),
+            CropForegroundd(keys=["image", "label_sc", "label_lesion"], source_key="image"),
             # Pad the image to a specified spatial size if its size is smaller than the specified dimensions
-            ResizeWithPadOrCropd(keys=["image", "label"], spatial_size=spatial_size),
-            ToTensord(keys=["image", "label"])
+            ResizeWithPadOrCropd(keys=["image", "label_sc", "label_lesion"], spatial_size=spatial_size),
         ]
     )
 
