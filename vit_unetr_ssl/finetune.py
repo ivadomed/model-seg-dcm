@@ -199,7 +199,7 @@ def main():
 
         with torch.no_grad():
             for _step, batch in enumerate(epoch_iterator_val):
-                val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label"].cuda(CUDA_NUM))
+                val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
                 val_outputs = sliding_window_inference(val_inputs, SPATIAL_SIZE, batch_size, model)
                 val_labels_list = decollate_batch(val_labels)
                 val_outputs_list = decollate_batch(val_outputs)
@@ -219,7 +219,7 @@ def main():
         epoch_iterator = tqdm(train_loader, desc="Training (X / X Steps) (loss=X.X)", dynamic_ncols=True)
         for step, batch in enumerate(epoch_iterator):
             step += 1
-            x, y = (batch["image"].cuda(CUDA_NUM), batch["label"].cuda(CUDA_NUM))
+            x, y = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
             logit_map = model(x)
             loss = loss_function(logit_map, y)
             loss.backward()
