@@ -200,7 +200,7 @@ def main():
         with torch.no_grad():
             for _step, batch in enumerate(epoch_iterator_val):
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
-                val_outputs = sliding_window_inference(val_inputs, SPATIAL_SIZE, batch_size, model)
+                val_outputs = sliding_window_inference(val_inputs, ROI_SIZE, batch_size, model)
                 val_labels_list = decollate_batch(val_labels)
                 val_outputs_list = decollate_batch(val_outputs)
                 dice_metric(y_pred=val_outputs_list, y=val_labels_list)
