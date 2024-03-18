@@ -105,7 +105,8 @@ def main():
     check_loader = DataLoader(check_ds, batch_size=1)
     check_data = first(check_loader)
     logger.info(f'original image shape: {check_data["image"][0][0].shape}')
-    logger.info(f'original label shape: {check_data["label"][0][0].shape}')
+    logger.info(f'original SC label shape: {check_data["label_sc"][0][0].shape}')
+    logger.info(f'original lesion label shape: {check_data["label_lesion"][0][0].shape}')
 
     # -----------------------------------------------------
     # Training Config
