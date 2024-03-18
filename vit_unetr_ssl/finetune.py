@@ -96,7 +96,7 @@ def main():
 
     # roi_size is used to crop samples around the spinal cord
     train_transforms = define_finetune_train_transforms(spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
-    val_transforms = define_finetune_val_transforms(spatial_size=SPATIAL_SIZE)
+    val_transforms = define_finetune_val_transforms(spatial_size=SPATIAL_SIZE, roi_size=ROI_SIZE)
 
     # -----------------------------------------------------
     # Sanity Check for the transforms

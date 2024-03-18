@@ -183,10 +183,11 @@ def define_finetune_train_transforms(spatial_size, roi_size):
     return train_transforms
 
 
-def define_finetune_val_transforms(spatial_size):
+def define_finetune_val_transforms(spatial_size, roi_size):
     """
     Define MONAI Transforms for Validation of the fine-tuned model
     :args: spatial_size: spatial size of the input image, e.g. (64, 256, 256)
+    :args: roi_size: size of the sample to crop, e.g. (64, 64, 64)
     """
     val_transforms = Compose(
         [
@@ -205,6 +206,17 @@ def define_finetune_val_transforms(spatial_size):
             CropForegroundd(keys=["image", "label_sc", "label_lesion"], source_key="image"),
             # Pad the image to a specified spatial size if its size is smaller than the specified dimensions
             ResizeWithPadOrCropd(keys=["image", "label_sc", "label_lesion"], spatial_size=spatial_size),
+            # Randomly crop samples of a specified size
+            RandCropByPosNegLabeld(
+                keys=["image", "label_sc", "label_lesion"],
+                label_key="label_sc",  # cropping around the SC
+                spatial_size=roi_size,
+                pos=1,
+                neg=0,
+                num_samples=1,  # if num_samples=1, then 1 samples/image are randomly generated
+                image_key="image",
+                image_threshold=0,
+            ),
         ]
     )
 
