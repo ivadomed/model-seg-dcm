@@ -208,6 +208,29 @@ def main():
                 dice_vals.append(dice)
                 epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, 10.0, dice))
 
+                # Create validation_figures directory if it does not exist
+                if not os.path.exists(os.path.join(logdir_path, "validation_figures")):
+                    os.mkdir(os.path.join(logdir_path, "validation_figures"))
+                if _step == 1:
+                    # Plot and save input and output validation images to see how the model is learning
+                    plt.figure(1, figsize=(8, 8))
+                    plt.subplot(2, 2, 1)
+                    plt.imshow(val_inputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Input Image")
+                    plt.subplot(2, 2, 2)
+                    plt.imshow(val_labels[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Ground Truth")
+                    plt.subplot(2, 2, 3)
+                    plt.imshow(val_outputs[0, 0, :, :, 32].detach().cpu().numpy(), cmap="gray")
+                    plt.title("Predicted")
+                    # Include the global_step as master title
+                    plt.suptitle(f"Validation Step: {global_step}")
+                    # Use 5 leading zeros for the global_step
+                    fname = os.path.join(logdir_path, "validation_figures", f"val_{global_step:05d}.png")
+                    plt.savefig(fname)
+                    plt.close(1)
+                    logger.info(f"Saved validation images to {fname}")
+
             dice_metric.reset()
 
         mean_dice_val = np.mean(dice_vals)
