@@ -166,7 +166,7 @@ def main():
     # Create dataloaders for training
     # -----------------------------------------------------
 
-    NUM_WORKERS = 0
+    NUM_WORKERS = batch_size
 
     train_dataset = CacheDataset(data=train_list, transform=train_transforms, cache_rate=0.5, num_workers=NUM_WORKERS)
     val_dataset = CacheDataset(data=val_list, transform=val_transforms, cache_rate=0.25, num_workers=NUM_WORKERS)
