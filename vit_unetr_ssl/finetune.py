@@ -117,7 +117,7 @@ def main():
     model = UNETR(
         in_channels=1,
         out_channels=1,
-        img_size=SPATIAL_SIZE,
+        img_size=ROI_SIZE,
         feature_size=16,
         hidden_size=768,
         mlp_dim=3072,
