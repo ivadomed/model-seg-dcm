@@ -190,10 +190,8 @@ def main():
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label"].cuda(CUDA_NUM))
                 val_outputs = sliding_window_inference(val_inputs, SPATIAL_SIZE, batch_size, model)
                 val_labels_list = decollate_batch(val_labels)
-                val_labels_convert = [post_label(val_label_tensor) for val_label_tensor in val_labels_list]
                 val_outputs_list = decollate_batch(val_outputs)
-                val_output_convert = [post_pred(val_pred_tensor) for val_pred_tensor in val_outputs_list]
-                dice_metric(y_pred=val_output_convert, y=val_labels_convert)
+                dice_metric(y_pred=val_outputs_list, y=val_labels_list)
                 dice = dice_metric.aggregate().item()
                 dice_vals.append(dice)
                 epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, 10.0, dice))
