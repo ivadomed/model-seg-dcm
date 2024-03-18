@@ -101,7 +101,8 @@ def main():
     # Training Config
     # -----------------------------------------------------
 
-    device = torch.device(f"cuda:{args.cuda}")
+    CUDA_NUM=args.cuda
+    device = torch.device(f"cuda:{CUDA_NUM}")
     model = UNETR(
         in_channels=1,
         out_channels=1,
