@@ -298,7 +298,7 @@ def main():
                 plt.xlabel("Iteration")
                 plt.plot(x, y)
                 plt.grid()
-                plt.savefig(os.path.join(logdir_path, "btcv_finetune_quick_update.png"))
+                plt.savefig(os.path.join(logdir_path, "finetune_quick_update.png"))
                 plt.clf()
                 plt.close(1)
 
