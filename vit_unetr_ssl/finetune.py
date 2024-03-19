@@ -273,7 +273,9 @@ def main():
 
                     plt.subplot(2, 2, 3)
                     logger.info(f'Predicted shape: {val_outputs_list_bin[0].numpy().shape}')
-                    plt.imshow(val_outputs_list_bin[0][0, :, :, slice_idx].numpy(), cmap="gray")
+                    plt.imshow(val_inputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
+                    plt.imshow(val_outputs_list_bin[0][0, :, :, slice_idx].numpy(), alpha=0.5, cmap="jet",
+                               interpolation='nearest')
                     plt.title("Predicted")
                     # Include the global_step as master title
                     plt.suptitle(f"Validation Step: {global_step}")
