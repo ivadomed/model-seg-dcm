@@ -217,7 +217,10 @@ def main():
                 if val_labels[0, 0, :, :, :].sum() > 0:
                     logger.info(f"Lesion found in the validation image. Saving the validation images.")
                     # if so, get corresponding slice
-                    slice_idx = val_labels[0, 0, :, :, :].nonzero()[:, 2].mean().int().item()
+                    slice_idx = val_labels[0, 0, :, :, :].detach().cpu().numpy().nonzero()[2][0].item()
+                    logger.info(slice_idx)
+                    # print unique values in the slice to see if it is binary
+                    logger.info(np.unique(val_labels[0, 0, :, :, slice_idx].detach().cpu().numpy()))
                     # Plot and save input and output validation images to see how the model is learning
                     plt.figure(1, figsize=(8, 8))
                     plt.subplot(2, 2, 1)
