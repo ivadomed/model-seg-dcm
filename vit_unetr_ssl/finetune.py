@@ -226,7 +226,9 @@ def main():
                     plt.title("Input Image")
                     plt.subplot(2, 2, 2)
                     logger.info(f'Ground truth shape: {val_labels.detach().cpu().numpy().shape}')
-                    plt.imshow(val_labels[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
+                    plt.imshow(val_inputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
+                    plt.imshow(val_labels[0, 0, :, :, slice_idx].detach().cpu().numpy(), alpha=0.5, cmap="jet",
+                               interpolation='nearest')
                     plt.title("Ground Truth")
                     plt.subplot(2, 2, 3)
                     logger.info(f'Predicted shape: {val_outputs.detach().cpu().numpy().shape}')
