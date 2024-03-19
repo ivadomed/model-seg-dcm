@@ -210,7 +210,6 @@ def main():
 
                 # get probabilities from logits
                 output = F.relu(val_outputs) / F.relu(val_outputs).max() if bool(F.relu(val_outputs).max()) else F.relu(val_outputs)
-                logger.info(np.unique(output.detach().cpu().numpy()))
 
                 # decollate_batch converts the batch (5D tensor) to a list of 4D tensors
                 val_labels_list = decollate_batch(val_labels)
