@@ -206,36 +206,69 @@ def main():
             for _step, batch in enumerate(epoch_iterator_val):
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
                 val_outputs = sliding_window_inference(val_inputs, ROI_SIZE, batch_size, model)
+                # decollate_batch converts the batch (5D tensor) to a list of 4D tensors
                 val_labels_list = decollate_batch(val_labels)
                 val_outputs_list = decollate_batch(val_outputs)
+
+                # NOTE: the lines below are just for debugging purposes
+                # logger.info(len(val_labels_list))
+                # logger.info(val_labels_list[0].detach().cpu().numpy().shape)
+                # # Get a list of non-zero slices
+                # slice_id_list = np.unique(val_labels_list[0][0,:,:,:].detach().cpu().numpy().nonzero()[2])
+                # logger.info(slice_id_list)
+                # # Nonzero slice
+                # slice_id = slice_id_list[2].item()
+                # logger.info(slice_id)
+                # logger.info(np.unique(val_labels_list[0][0,:,:,slice_id].detach().cpu().numpy()))
+
+                # At this moment, val_labels_list and val_outputs_list are non-binary, so we need to threshold them
+                val_outputs_list_bin = []
+                val_labels_list_bin = []
+                for i in range(len(val_outputs_list)):
+                    val_outputs_list_bin.append((val_outputs_list[i].detach().cpu() > 0.5).float())
+                    val_labels_list_bin.append((val_labels_list[i].detach().cpu() > 0.5).float())
+
+                # Now, the label is binarized
+                # logger.info(np.unique(val_labels_list_bin[0][0,:,:,slice_id].numpy()))
+
+                # Compute the dice metric on binarized outputs and labels
                 dice_metric(y_pred=val_outputs_list, y=val_labels_list)
                 dice = dice_metric.aggregate().item()
                 dice_vals.append(dice)
                 epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, 10.0, dice))
 
-                # Check whether val_labels is not empty (i.e., contains a lesion)
-                if val_labels[0, 0, :, :, :].sum() > 0:
+                # Check whether val_labels is not empty (i.e., GT contains a lesion)
+                if val_labels_list_bin[0][0, :, :, :].sum() > 0:
                     logger.info(f"Lesion found in the validation image. Saving the validation images.")
-                    # if so, get corresponding slice
-                    slice_idx = val_labels[0, 0, :, :, :].detach().cpu().numpy().nonzero()[2][0].item()
+                    # if val_labels is not empty, get a list of slices with non-zero voxels
+                    slice_idx_list = np.unique(val_labels_list_bin[0][0, :, :, :].numpy().nonzero()[2])
+                    logger.info(slice_idx_list)
+                    # get ~middle slice
+                    slice_idx = slice_idx_list[len(slice_idx_list) // 2]
                     logger.info(slice_idx)
-                    # print unique values in the slice to see if it is binary
-                    logger.info(np.unique(val_labels[0, 0, :, :, slice_idx].detach().cpu().numpy()))
+                    # print unique values to make sure the label is binary-- values should be 0 and 1.
+                    logger.info(f'GT slice: {slice_idx}, unique values: '
+                                f'{np.unique(val_labels_list_bin[0][0, :, :, slice_idx].numpy())}')
+                    logger.info(f'Predicted slice: {slice_idx}, unique values: '
+                                f'{np.unique(val_outputs_list_bin[0][0, :, :, slice_idx].numpy())}')
+
                     # Plot and save input and output validation images to see how the model is learning
                     plt.figure(1, figsize=(8, 8))
                     plt.subplot(2, 2, 1)
                     logger.info(f'Input image shape: {val_inputs.detach().cpu().numpy().shape}')
                     plt.imshow(val_inputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
                     plt.title("Input Image")
+
                     plt.subplot(2, 2, 2)
-                    logger.info(f'Ground truth shape: {val_labels.detach().cpu().numpy().shape}')
+                    logger.info(f'Ground truth shape: {val_labels_list_bin[0].numpy().shape}')
                     plt.imshow(val_inputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
-                    plt.imshow(val_labels[0, 0, :, :, slice_idx].detach().cpu().numpy(), alpha=0.5, cmap="jet",
+                    plt.imshow(val_labels_list_bin[0][0, :, :, slice_idx].numpy(), alpha=0.5, cmap="jet",
                                interpolation='nearest')
                     plt.title("Ground Truth")
+
                     plt.subplot(2, 2, 3)
-                    logger.info(f'Predicted shape: {val_outputs.detach().cpu().numpy().shape}')
-                    plt.imshow(val_outputs[0, 0, :, :, slice_idx].detach().cpu().numpy(), cmap="gray")
+                    logger.info(f'Predicted shape: {val_outputs_list_bin[0].numpy().shape}')
+                    plt.imshow(val_outputs_list_bin[0][0, :, :, slice_idx].numpy(), cmap="gray")
                     plt.title("Predicted")
                     # Include the global_step as master title
                     plt.suptitle(f"Validation Step: {global_step}")
