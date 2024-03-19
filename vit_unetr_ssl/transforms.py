@@ -177,6 +177,7 @@ def define_finetune_train_transforms(spatial_size, roi_size):
             RandGaussianSmoothd(keys=["image"], sigma_x=(0., 2.), sigma_y=(0., 2.), sigma_z=(0., 2.0),
                                 prob=0.2),
             RandFlipd(keys=["image", "label_lesion"], prob=0.2),
+            AsDiscreted(keys=["label_sc", "label_lesion"], to_onehot=None, threshold_values=True, logit_thresh=0.5),
         ]
     )
 
@@ -217,6 +218,7 @@ def define_finetune_val_transforms(spatial_size, roi_size):
                 image_key="image",
                 image_threshold=0,
             ),
+            AsDiscreted(keys=["label_sc", "label_lesion"], to_onehot=None, threshold_values=True, logit_thresh=0.5),
         ]
     )
 
