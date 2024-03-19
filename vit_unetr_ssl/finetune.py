@@ -10,6 +10,7 @@ Author: Jan Valosek
 import os
 import argparse
 import torch
+import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -206,6 +207,11 @@ def main():
             for _step, batch in enumerate(epoch_iterator_val):
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
                 val_outputs = sliding_window_inference(val_inputs, ROI_SIZE, batch_size, model)
+
+                # get probabilities from logits
+                output = F.relu(val_outputs) / F.relu(val_outputs).max() if bool(F.relu(val_outputs).max()) else F.relu(val_outputs)
+                logger.info(np.unique(output.detach().cpu().numpy()))
+
                 # decollate_batch converts the batch (5D tensor) to a list of 4D tensors
                 val_labels_list = decollate_batch(val_labels)
                 val_outputs_list = decollate_batch(val_outputs)
@@ -291,7 +297,9 @@ def main():
             step += 1
             x, y = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
             logit_map = model(x)
-            loss = loss_function(logit_map, y)
+            # get probabilities from logits
+            output = F.relu(logit_map) / F.relu(logit_map).max() if bool(F.relu(logit_map).max()) else F.relu(logit_map)
+            loss = loss_function(output, y)
             loss.backward()
             epoch_loss += loss.item()
             optimizer.step()
