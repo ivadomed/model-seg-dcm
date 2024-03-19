@@ -159,7 +159,7 @@ def main():
     max_iterations = 30000
     eval_num = 100
     batch_size = 8
-    loss_function = DiceCELoss()
+    loss_function = DiceCELoss(include_background=True)
     torch.backends.cudnn.benchmark = True
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-5)
 
@@ -238,7 +238,7 @@ def main():
                 # logger.info(np.unique(val_labels_list_bin[0][0,:,:,slice_id].numpy()))
 
                 # Compute the dice metric on binarized outputs and labels
-                dice_metric(y_pred=val_outputs_list, y=val_labels_list)
+                dice_metric(y_pred=val_outputs_list_bin, y=val_labels_list_bin)
                 dice = dice_metric.aggregate().item()
                 dice_vals.append(dice)
                 epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, 10.0, dice))
