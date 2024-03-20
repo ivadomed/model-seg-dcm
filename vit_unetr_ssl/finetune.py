@@ -219,7 +219,8 @@ def main():
                 # Print val_outputs shape
                 logger.info(f'val_outputs shape: {val_outputs.shape}')
 
-                # decollate_batch converts the batch (5D tensor) to a list of 4D tensors
+                # 'decollate_batch' converts the batch (5D tensor: batch_size, channels, depth, height, width) to a
+                # list of 4D tensors (batch_size, depth, height, width)
                 val_labels_list = decollate_batch(val_labels)
                 val_outputs_list = decollate_batch(val_outputs)
 
@@ -241,6 +242,7 @@ def main():
                 # At this moment, val_labels_list and val_outputs_list are non-binary, so we need to threshold them
                 val_outputs_list_bin = []
                 val_labels_list_bin = []
+                # NOTE: the loop is used because batch_size > 1
                 for i in range(len(val_outputs_list)):
                     val_outputs_list_bin.append((val_outputs_list[i].detach().cpu() > 0.5).float())
                     val_labels_list_bin.append((val_labels_list[i].detach().cpu() > 0.5).float())
