@@ -186,7 +186,7 @@ def main():
                               pin_memory=True,
                               persistent_workers=False)
     val_loader = DataLoader(val_dataset,
-                            batch_size=batch_size,
+                            batch_size=1,
                             shuffle=True,
                             num_workers=NUM_WORKERS,
                             pin_memory=True,
