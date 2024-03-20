@@ -39,6 +39,7 @@ from transforms import define_finetune_train_transforms, define_finetune_val_tra
 # https://github.com/pytorch/pytorch/issues/11201#issuecomment-421146936
 # https://github.com/ivadomed/model-seg-dcm/issues/8
 import torch.multiprocessing
+
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
@@ -113,7 +114,7 @@ def main():
     # Training Config
     # -----------------------------------------------------
 
-    CUDA_NUM=args.cuda
+    CUDA_NUM = args.cuda
     device = torch.device(f"cuda:{CUDA_NUM}")
     model = UNETR(
         in_channels=1,
