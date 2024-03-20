@@ -208,13 +208,23 @@ def main():
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
                 val_outputs = sliding_window_inference(val_inputs, ROI_SIZE, batch_size, model)
 
+                # Print val_outputs shape
+                logger.info(f'val_outputs shape: {val_outputs.shape}')
+
                 # get probabilities from logits
                 val_outputs = F.relu(val_outputs) / F.relu(val_outputs).max() if bool(
                     F.relu(val_outputs).max()) else F.relu(val_outputs)
 
+                # Print val_outputs shape
+                logger.info(f'val_outputs shape: {val_outputs.shape}')
+
                 # decollate_batch converts the batch (5D tensor) to a list of 4D tensors
                 val_labels_list = decollate_batch(val_labels)
                 val_outputs_list = decollate_batch(val_outputs)
+
+                # Print val_outputs_list shape
+                logger.info(f'val_outputs_list len: {len(val_outputs_list)}')
+                logger.info(f'val_outputs_list[0] shape: {val_outputs_list[0].shape}')
 
                 # NOTE: the lines below are just for debugging purposes
                 # logger.info(len(val_labels_list))
