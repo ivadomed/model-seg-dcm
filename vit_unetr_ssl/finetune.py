@@ -341,7 +341,7 @@ def main():
 
                 plt.figure(1, (12, 6))
                 plt.subplot(1, 2, 1)
-                plt.title("Iteration Average Loss")
+                plt.title("Iteration Average Training Loss")
                 x = [eval_num * (i + 1) for i in range(len(epoch_loss_values))]
                 y = epoch_loss_values
                 plt.xlabel("Iteration")
