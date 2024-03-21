@@ -56,7 +56,7 @@ def get_parser():
                              'file will be used.')
     parser.add_argument('--logdir', required=True, type=str,
                         help='Path to the directory for logging.')
-    parser.add_argument('--pretrained-model', required=True, type=str,
+    parser.add_argument('--pretrained-model', required=False, type=str,
                         help='Path to the pretrained model.')
     parser.add_argument('--cuda', type=int, default=0, help='Index of the CUDA device to use.')
 
@@ -73,7 +73,7 @@ def main():
     json_path = os.path.abspath(args.dataset_split)
     data_root = os.path.abspath(args.data)
     logdir_path = os.path.abspath(args.logdir)
-    pretrained_model_path = os.path.abspath(args.pretrained_model)
+    pretrained_model_path = os.path.abspath(args.pretrained_model) if args.pretrained_model is not None else None
     use_pretrained = True if pretrained_model_path is not None else False
 
     # -----------------------------------------------------
