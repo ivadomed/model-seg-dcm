@@ -2,6 +2,9 @@
 Create MSD-style JSON datalist file for BIDS datasets.
 The following two keys are included in the JSON file: 'image' and 'label_sc'.
 
+NOTE: the script is meant to be used for pre-training, meaning that the dataset is split into training and validation.
+In other words, NO testing set is created.
+
 The script has to be run for each dataset separately, meaning that one JSON file is created for each dataset.
 
 Example usage:
