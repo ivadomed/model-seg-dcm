@@ -116,8 +116,8 @@ def main():
     train_images.update({sub: os.path.join(root, sub) for sub in tr_seg_files})
     val_images.update({sub: os.path.join(root, sub) for sub in val_seg_files})
 
-    logger.info(f"Found subjects in the training set (combining all datasets): {len(train_images)}")
-    logger.info(f"Found subjects in the validation set (combining all datasets): {len(val_images)}")
+    logger.info(f"Found subjects in the training set: {len(train_images)}")
+    logger.info(f"Found subjects in the validation set: {len(val_images)}")
 
     # keys to be defined in the dataset_0.json
     params = {}
