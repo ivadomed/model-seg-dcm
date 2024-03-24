@@ -20,9 +20,7 @@ Example usage:
 """
 
 import os
-import re
 import json
-from tqdm import tqdm
 import argparse
 from pathlib import Path
 from loguru import logger
