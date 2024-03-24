@@ -64,10 +64,11 @@ def get_parser():
 def main():
     args = get_parser().parse_args()
 
-    dataset = args.path_data
+    dataset = os.path.abspath(args.path_data)
     dataset_name = args.dataset_name
     train_ratio, val_ratio = args.split
     seed = args.seed
+    path_out = os.path.abspath(args.path_out)
 
     # Check if the dataset name is valid
     if dataset_name not in contrast_dict.keys():
@@ -166,13 +167,13 @@ def main():
             logger.info(f"Number of images in {name} set: {len(temp_list)}")
 
     final_json = json.dumps(params, indent=4, sort_keys=False)
-    if not os.path.exists(args.path_out):
-        os.makedirs(args.path_out, exist_ok=True)
+    if not os.path.exists(path_out):
+        os.makedirs(path_out, exist_ok=True)
 
-    jsonFile = open(args.path_out + "/" + f"{datalist_fname}.json", "w")
+    jsonFile = open(path_out + "/" + f"{datalist_fname}.json", "w")
     jsonFile.write(final_json)
     jsonFile.close()
-    print(f"JSON file saved to {args.path_out}/{datalist_fname}.json")
+    print(f"JSON file saved to {path_out}/{datalist_fname}.json")
 
 
 if __name__ == "__main__":
