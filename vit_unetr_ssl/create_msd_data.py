@@ -153,7 +153,7 @@ def main():
                     temp_data_t2w["image"] = label.replace(f'_{sc_fname_suffix}', '').replace('labels',
                                                                                               'data_preprocessed')
                 else:
-                    temp_data_t2w["image"] = label.replace(f'_{sc_fname_suffix}', '').replace('derivatives/labels', '')
+                    temp_data_t2w["image"] = label.replace(f'_{sc_fname_suffix}', '').replace('/derivatives/labels', '')
 
                 # Spinal cord segmentation file
                 temp_data_t2w["label_sc"] = label
