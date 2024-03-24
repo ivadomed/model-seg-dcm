@@ -15,7 +15,7 @@ def train_transforms(crop_size, patch_size, device="cuda", type="pretraining"):
             transforms.EnsureChannelFirstd(keys=all_keys),
             transforms.Orientationd(keys=all_keys, axcodes="RPI"),
             # NOTE: spine interpolation with order=2 is spline, order=1 is linear
-            transforms.Spacingd(keys=all_keys, pixdim=(1.0, 1.0, 1.0), mode=(2, 1, 1)),
+            transforms.Spacingd(keys=all_keys, pixdim=(1.0, 1.0, 1.0), mode=(2, 1)),
             transforms.NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             transforms.CropForegroundd(keys=all_keys, source_key="image"),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size),
@@ -103,7 +103,7 @@ def val_transforms(crop_size, type="pretraining"):
             transforms.LoadImaged(keys=all_keys, image_only=False),
             transforms.EnsureChannelFirstd(keys=all_keys),
             transforms.Orientationd(keys=all_keys, axcodes="RPI"),
-            transforms.Spacingd(keys=all_keys, pixdim=(1.0, 1.0, 1.0), mode=(2, 1, 1)),
+            transforms.Spacingd(keys=all_keys, pixdim=(1.0, 1.0, 1.0), mode=(2, 1)),
             transforms.NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size,),
         ])
