@@ -58,3 +58,13 @@ git annex dead here
 git annex get $(find . -name "*T2w.nii.gz")
 git annex get $(find . -name "*T2w_seg.nii.gz")
 ```
+
+### Create MSD-style JSON datalists
+
+```commandline
+python /Users/user/code/model-seg-dcm/vit_unetr_ssl/create_msd_data.py --path-data data-multi-subject --dataset-name spine-generic --path-out . --split 0.8 0.2 --seed 42
+python /Users/user/code/model-seg-dcm/vit_unetr_ssl/create_msd_data.py --path-data canproco --dataset-name canproco --path-out . --split 0.8 0.2 --seed 42
+python /Users/user/code/model-seg-dcm/vit_unetr_ssl/create_msd_data.py --path-data sci-colorado --dataset-name sci-colorado --path-out . --split 0.8 0.2 --seed 42
+python /Users/user/code/model-seg-dcm/vit_unetr_ssl/create_msd_data.py --path-data dcm-zurich --dataset-name dcm-zurich --path-out . --split 0.8 0.2 --seed 42
+python /Users/user/code/model-seg-dcm/vit_unetr_ssl/create_msd_data.py --path-data sci-paris --dataset-name sci-paris --path-out . --split 0.8 0.2 --seed 42
+```
