@@ -39,7 +39,7 @@ sc_fname_suffix_dict = {
     'spine-generic': 'label-SC_seg',
     'canproco': 'seg-manual',
     'dcm-zurich': 'label-SC_mask-manual',
-    'sci-paris': 'seg',
+    'sci-paris': 'seg-manual',
     'sci-colorado': 'seg-manual'
 }
 
