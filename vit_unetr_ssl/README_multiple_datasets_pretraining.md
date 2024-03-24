@@ -46,7 +46,7 @@ git clone git@data.neuro.polymtl.ca:datasets/dcm-zurich
 cd dcm-zurich
 git annex dead here
 git annex get $(find . -name "*acq-axial_T2w.nii.gz")
-git annex get $(find . -name "*acq-axial_label-SC_mask-manual.nii.gz")
+git annex get $(find . -name "*acq-axial_T2w_label-SC_mask-manual.nii.gz")
 ```
 
 `sci-paris` (n=14)
