@@ -20,7 +20,7 @@ def train_transforms(crop_size, patch_size, device="cuda", type="pretraining"):
             transforms.CropForegroundd(keys=all_keys, source_key="image"),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size),
             # convert the data to Tensor without meta, move to GPU and cache it to avoid CPU -> GPU sync in every epoch
-            transforms.transforms.EnsureTyped(keys=all_keys, device=device, track_meta=False),
+            transforms.EnsureTyped(keys=all_keys, device=device, track_meta=False),
             
             # sample patches from cropped image
             transforms.RandCropByPosNegLabeld(keys=all_keys,
