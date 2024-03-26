@@ -79,7 +79,8 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
 
     return epoch_loss_train/len(train_loader)
 
-@torch.no_grad()
+
+@torch.no_grad()    # this decorator disables gradient tracking
 def evaluate(val_loader, model, loss_function, writer, epoch, device):
 
     # set in eval mode
