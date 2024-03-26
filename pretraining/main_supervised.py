@@ -170,6 +170,7 @@ def main_worker(args):
     # load config file
     with open(args.config, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+        logger.info(f"Loaded config file: {args.config}")
 
     # for reproducibility purposes set a seed
     set_determinism(config["autoencoderkl"]["seed"])
