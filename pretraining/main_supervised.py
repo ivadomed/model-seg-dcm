@@ -32,6 +32,9 @@ def get_parser():
                             help='Path to the folder containing datalists for each dataset.')
     parser.add_argument("--path-out", type=str, help="Path to the output directory.")
     
+    parser.add_argument("--datalists", nargs="+", type=str, default=None,
+                        help="List of JSON datalist(s) for each dataset. If not provided (None), all datalists in the "
+                             "'--path-data' folder will be used. Default: None.")
     parser.add_argument('-m', '--model', choices=['nnunet', 'monai-unet', 'unetr', 'swinunetr'], 
                         default='nnunet', type=str, 
                         help=f"Model to be used for pretraining.")
@@ -173,11 +176,19 @@ def main_worker(args):
     # for reproducibility purposes set a seed
     set_determinism(config["autoencoderkl"]["seed"])
 
-    log_dir = Path(args.path_out)
+    # No datalists manually provided --> load all datalists in the folder
+    if args.datalists is None:
+        datalists_list = [f for f in os.listdir(args.path_data) if f.endswith(".json")]
+    else:
+        datalists_list = args.datalists
+    logger.info(f"The following datalists will be used: {datalists_list}")
+
+    # Get absolute path to the datalists
+    datalists_list = [os.path.join(args.path_data, f) for f in datalists_list]
 
     logger.info("Getting data...")
     train_loader, val_loader = load_data(
-        datalists_path=os.path.join(args.path_data[0], "dataset_finetuning_dcm_lesions_seed42.json"),
+        datalists_paths=datalists_list,
         train_batch_size=config["train_batch_size"],
         val_batch_size=config["val_batch_size"],
         num_workers=8,
