@@ -6,16 +6,16 @@ from monai.data import (DataLoader, Dataset, list_data_collate, DistributedSampl
 from transforms import train_transforms, val_transforms
 
 
-def load_data(datalist_path, train_batch_size, val_batch_size, num_workers=8, use_distributed=False, 
+def load_data(datalists_paths, train_batch_size, val_batch_size, num_workers=8, use_distributed=False,
               crop_size=(64, 192, 320), patch_size=(64, 64, 64), device="cuda", task="pretraining"):
     """
     Return train and val dataloaders from datalist json file
     """
-
-    # TODO: accommodate multiple datalists
-
-    train_datalist = load_decathlon_datalist(data_list_file_path=datalist_path, data_list_key="training")
-    val_datalist = load_decathlon_datalist(data_list_file_path=datalist_path, data_list_key="validation")
+    train_datalist = []
+    val_datalist = []
+    for datalist_path in datalists_paths:
+        train_datalist += load_decathlon_datalist(data_list_file_path=datalist_path, data_list_key="training")
+        val_datalist += load_decathlon_datalist(data_list_file_path=datalist_path, data_list_key="validation")
 
     train_tfs = train_transforms(crop_size, patch_size, device=device, type=task)
     val_tfs = val_transforms(crop_size, type=task)
