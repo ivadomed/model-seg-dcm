@@ -28,28 +28,25 @@ def get_parser():
 
     parser = argparse.ArgumentParser(description="Supervised Pretraining on spinal cord T2w MRI data")
 
-    parser.add_argument('--path-data', nargs='+', required=True, type=str,
-                            help='Path to the folder containing datalists for each dataset.')
-    parser.add_argument("--path-out", type=str, help="Path to the output directory.")
-    
+    parser.add_argument("--path-data", required=True, type=str,
+                        help="Path to the folder containing datalist(s) for each dataset.")
     parser.add_argument("--datalists", nargs="+", type=str, default=None,
                         help="List of JSON datalist(s) for each dataset. If not provided (None), all datalists in the "
                              "'--path-data' folder will be used. Default: None.")
+    parser.add_argument("--path-out", type=str, required=True,
+                        help="Path to the output directory. The model and the log will be saved here.")
     parser.add_argument('-m', '--model', choices=['nnunet', 'monai-unet', 'unetr', 'swinunetr'], 
                         default='nnunet', type=str, 
                         help=f"Model to be used for pretraining.")
-
     parser.add_argument("--config", type=str, required=True,
-                        help="Path to the config file containing all training details.")
+                        help="Path to the YAML config file containing all training details.")
     parser.add_argument("-rfc", "--resume-from-checkpoint", action="store_true",
                         help="Resume training from checkpoint.")
-    parser.add_argument("--run_dir", help="Location of model to resume.")
+    parser.add_argument("--run-dir", help="Location of model to resume.")
     parser.add_argument("--debug", action="store_true", help="Debug mode")
-
     parser.add_argument("--dist", action="store_true", default=False,
                         help="Use distributed training")
     parser.add_argument("--local-rank", type=int, default=0)
-
 
     return parser
 
