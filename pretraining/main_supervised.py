@@ -144,6 +144,10 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
 
 def main_worker(args):
 
+    # save output to a log file
+    log_dir = Path(args.path_out)
+    logger.add(str(log_dir / "log.txt"), rotation="10 MB", level="INFO")
+
     # disable logging for processes except 0 on every node
     if args.local_rank != 0:
         f = open(os.devnull, "w")
