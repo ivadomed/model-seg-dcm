@@ -10,6 +10,15 @@ def load_data(datalists_paths, train_batch_size, val_batch_size, num_workers=8, 
               crop_size=(64, 192, 320), patch_size=(64, 64, 64), device="cuda", task="pretraining"):
     """
     Return train and val dataloaders from datalist json file
+    :param datalists_paths: path(s) to the datalist json file(s)
+    :param train_batch_size: batch size for training dataloader
+    :param val_batch_size: batch size for validation dataloader
+    :param num_workers: number of workers for dataloader
+    :param use_distributed: whether to use distributed training
+    :param crop_size: crop size for training data
+    :param patch_size: patch size for training data
+    :param device: device to load data and apply transforms
+    :param task: task for train/val transforms; choices: pretraining or finetuning
     """
     train_datalist = []
     val_datalist = []
