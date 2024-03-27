@@ -284,6 +284,10 @@ def main_worker(args):
     logger.info("Building model...") if local_rank == 0 else None
     model = BackboneModel(model_name=args.model, config=config)
     model.run_folder = f"{model.run_folder}_{datetime.now().strftime('%Y%m%d-%H%M')}"
+    log_dir = log_dir / model.run_folder
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir, exist_ok=True)
+        os.makedirs(log_dir / "models", exist_ok=True)  # to save model checkpoints
     
     if args.dist:
         logger.info("Wrapping the model with Distributed Data Parallel ...")
@@ -312,9 +316,8 @@ def main_worker(args):
                                               max_epochs=config["opt"]["max_epochs"])
 
     # Tensorboard writers
-    if args.local_rank == 0:
-        writer_train = SummaryWriter(str(log_dir / "train_logs"))
-        writer_val = SummaryWriter(str(log_dir / "val_logs"))
+    writer_train = SummaryWriter(str(log_dir / "train_logs"))
+    writer_val = SummaryWriter(str(log_dir / "val_logs"))
 
     # Get Checkpoint
     best_loss = float("inf")
