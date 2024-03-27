@@ -16,6 +16,7 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 from monai.utils import set_determinism
+from monai.inferers import sliding_window_inference
 
 from loss import DiceCrossEntropyLoss
 from lr_scheduler import LinearWarmupCosineAnnealingLR
@@ -154,7 +155,9 @@ def evaluate(val_loader, model, loss_function, writer, epoch, device):
 
         with autocast(enabled=True):
             
-            logits = model(x)
+            logits = sliding_window_inference(inputs=x, roi_size=x.shape[-3:], sw_batch_size=4, 
+                                              predictor=model, overlap=0.5, mode="gaussian")
+            
             if model.model_name == "nnunet":
                 logits = logits[0]  # take only the highest resolution output
 
