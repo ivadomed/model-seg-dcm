@@ -12,8 +12,8 @@ def load_data(datalists_paths, train_batch_size, val_batch_size, num_workers=8, 
     :param val_batch_size: batch size for validation dataloader
     :param num_workers: number of workers for dataloader
     :param use_distributed: whether to use distributed training
-    :param crop_size: crop size for training data
-    :param patch_size: patch size for training data
+    :param crop_size: crop size; e.g., (64, 192, 320)
+    :param patch_size: patch size; e.g., (64, 64, 64)
     :param device: device to load data and apply transforms
     :param task: task for train/val transforms; choices: pretraining or finetuning
     """
