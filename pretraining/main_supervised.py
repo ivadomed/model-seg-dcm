@@ -21,10 +21,9 @@ from monai.inferers import sliding_window_inference
 from loss import DiceCrossEntropyLoss
 from lr_scheduler import LinearWarmupCosineAnnealingLR
 from loader import load_data
-from utils import dice_score
 
 from models.backbone import BackboneModel
-from utils import SmartFormatter
+from utils import SmartFormatter, dice_score
 
 torch.multiprocessing.set_sharing_strategy('file_system')
 local_rank = int(os.environ["LOCAL_RANK"])
@@ -156,10 +155,9 @@ def evaluate(val_loader, model, loss_function, writer, epoch, device):
         # NOTE: if the model is wrapped around DDP, then it has to be unwrapped to access the model's attributes
         model = model.module
 
+    for step, batch_data in enumerate(val_loader):
             
-        x, y = x["image"].to(device), x["label_sc"].to(device)
-
-        # TODO: use sliding window inference here. what is this below ?!
+        x, y = batch_data["image"].to(device), batch_data["label_sc"].to(device)
 
         with autocast(enabled=True):
             
@@ -244,10 +242,10 @@ def main_worker(args):
     else:
         logger.info("Training with a single process on 1 GPU.")
 
-    device = torch.device(f"cuda:{args.local_rank}")
-    torch.cuda.set_device(device)
-    logger.info(f"Using device: {device}")
     torch.backends.cudnn.benchmark = True
+    # Enable TF32 on matmul and on cuDNN
+    torch.backends.cuda.matmul.allow_tf32 = True    # same as setting torch.set_float32_matmul_precision("high"/"medium")
+    torch.backends.cudnn.allow_tf32 = True
 
     # load config file
     with open(args.config, "r") as f:
@@ -270,8 +268,8 @@ def main_worker(args):
     logger.info("Getting data...") if local_rank == 0 else None
     train_loader, val_loader = load_data(
         datalists_paths=datalists_list,
-        train_batch_size=config["train_batch_size"],
-        val_batch_size=config["val_batch_size"],
+        train_batch_size=config["opt"]["batch_size"],
+        val_batch_size=1,
         num_workers=8,
         use_distributed=False,
         crop_size=config["preprocessing"]["crop_pad_size"],
