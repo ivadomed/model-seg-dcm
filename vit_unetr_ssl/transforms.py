@@ -171,12 +171,12 @@ def define_finetune_train_transforms(spatial_size, roi_size):
                         # monai expects in radians
                         scale_range=(-0.2, 0.2),
                         translate_range=(-0.1, 0.1)),
-            RandSimulateLowResolutiond(keys=["image"], zoom_range=(0.5, 1.0), prob=0.2),
+            RandSimulateLowResolutiond(keys=["image"], zoom_range=(0.5, 1.0), prob=0.5),
             RandAdjustContrastd(keys=["image"], gamma=(0.5, 3.), prob=0.2),  # this is monai's RandomGamma
             RandBiasFieldd(keys=["image"], coeff_range=(0.0, 0.5), degree=3, prob=0.1),
             RandGaussianSmoothd(keys=["image"], sigma_x=(0., 2.), sigma_y=(0., 2.), sigma_z=(0., 2.0),
                                 prob=0.2),
-            RandFlipd(keys=["image", "label_lesion"], prob=0.2),
+            RandFlipd(keys=["image", "label_lesion"], prob=0.5),
             #AsDiscreted(keys=["label_sc", "label_lesion"], to_onehot=None, threshold_values=True, logit_thresh=0.5),
         ]
     )

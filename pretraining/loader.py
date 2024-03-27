@@ -27,9 +27,11 @@ def load_data(datalists_paths, train_batch_size, val_batch_size, num_workers=8, 
     val_tfs = val_transforms(crop_size, task=task)
 
     # training dataset
-    train_ds = CacheDataset(data=train_datalist, transform=train_tfs, cache_rate=0.5, num_workers=8)
+    train_ds = CacheDataset(data=train_datalist, transform=train_tfs, cache_rate=0.5, num_workers=4, 
+                            copy_cache=False)
     # validation dataset
-    val_ds = CacheDataset(data=val_datalist, transform=val_tfs, cache_rate=0.25, num_workers=8)
+    val_ds = CacheDataset(data=val_datalist, transform=val_tfs, cache_rate=0.25, num_workers=4,
+                          copy_cache=False)
 
     if use_distributed:
         train_sampler = DistributedSampler(dataset=train_ds, even_divisible=True, shuffle=True)
@@ -39,10 +41,10 @@ def load_data(datalists_paths, train_batch_size, val_batch_size, num_workers=8, 
         val_sampler = None
 
     # training dataloader    
-    train_loader = DataLoader(train_ds, batch_size=train_batch_size, shuffle=False, num_workers=num_workers, 
-                            pin_memory=False, sampler=train_sampler, persistent_workers=True, drop_last=False)
+    train_loader = DataLoader(train_ds, batch_size=train_batch_size, shuffle=True, num_workers=num_workers, 
+                            pin_memory=True, sampler=train_sampler, persistent_workers=True)
     # validation dataloader
     val_loader = DataLoader(val_ds, batch_size=val_batch_size, shuffle=False, num_workers=num_workers,
-                            pin_memory=False, sampler=val_sampler, persistent_workers=True, drop_last=False)
+                            pin_memory=True, sampler=val_sampler, persistent_workers=True)
 
     return train_loader, val_loader

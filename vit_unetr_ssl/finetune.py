@@ -34,12 +34,12 @@ from monai.data import (
 
 from load_data import load_data
 from transforms import define_finetune_train_transforms, define_finetune_val_transforms
+from utils import count_parameters
 
 # Added this to solve problem with too many files open allowing number of workers > 0
 # https://github.com/pytorch/pytorch/issues/11201#issuecomment-421146936
 # https://github.com/ivadomed/model-seg-dcm/issues/8
 import torch.multiprocessing
-
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 
@@ -120,15 +120,18 @@ def main():
         in_channels=1,
         out_channels=1,
         img_size=ROI_SIZE,
-        feature_size=16,
-        hidden_size=768,
-        mlp_dim=3072,
-        num_heads=12,
-        pos_embed="conv",
+        feature_size=32,
+        hidden_size=256,
+        mlp_dim=768,
+        num_heads=8,
+        proj_type="conv",
         norm_name="instance",
         res_block=True,
         dropout_rate=0.0,
     )
+
+    num_model_params = count_parameters(model=model)
+    logger.info(f"Number of Trainable model parameters: {(num_model_params / 1e6):.3f}M")
 
     # -----------------------------------------------------
     # Load ViT backbone weights into UNETR
@@ -207,7 +210,7 @@ def main():
         with torch.no_grad():
             for _step, batch in enumerate(epoch_iterator_val):
                 val_inputs, val_labels = (batch["image"].cuda(CUDA_NUM), batch["label_lesion"].cuda(CUDA_NUM))
-                val_outputs = sliding_window_inference(val_inputs, ROI_SIZE, batch_size, model)
+                val_outputs = sliding_window_inference(val_inputs, ROI_SIZE, sw_batch_size=4, predictor=model)
 
                 # Print val_outputs shape
                 logger.info(f'val_outputs shape: {val_outputs.shape}')
@@ -254,7 +257,7 @@ def main():
                 dice_metric(y_pred=val_outputs_list_bin, y=val_labels_list_bin)
                 dice = dice_metric.aggregate().item()
                 dice_vals.append(dice)
-                epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, 10.0, dice))
+                epoch_iterator_val.set_description("Validate (%d / %d Steps) (dice=%2.5f)" % (global_step, len(epoch_iterator_val), dice))
 
                 # Check whether val_labels is not empty (i.e., GT contains a lesion)
                 if val_labels_list_bin[0][0, :, :, :].sum() > 0:

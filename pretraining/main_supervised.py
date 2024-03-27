@@ -6,6 +6,7 @@ import yaml
 import sys
 from pathlib import Path
 from textwrap import dedent
+from datetime import datetime
 
 import torch
 import torch.nn.functional as F
@@ -19,10 +20,12 @@ from monai.utils import set_determinism
 from loss import DiceCrossEntropyLoss
 from lr_scheduler import LinearWarmupCosineAnnealingLR
 from loader import load_data
+from utils import dice_score
 
 from models.backbone import BackboneModel
 from utils import SmartFormatter
 
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 def get_parser():
 
@@ -77,7 +80,7 @@ def get_parser():
 def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_function, scaler, writer, device):
     # set in train mode
     model.train()
-    epoch_loss_train = 0
+    epoch_loss_train, epoch_soft_dice_train = 0, 0
     
     epoch_iterator = tqdm(enumerate(train_loader), total=len(train_loader))
 
@@ -88,11 +91,42 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
         optimizer.zero_grad()
         with autocast(enabled=True):
             logits = model(x)
-            # get probabilities from logits
-            y_hat = F.relu(logits) / F.relu(logits).max() if bool(F.relu(logits).max()) else F.relu(logits)
-            loss = loss_function(y_hat, y)
+
+            if model.model_name in ["nnunet"]:
+
+                loss, train_soft_dice = 0.0, 0.0
+                for i in range(len(logits)):
+                    # give each output a weight which decreases exponentially (division by 2) as the resolution decreases
+                    # this gives higher resolution outputs more weight in the loss
+                    # NOTE: outputs[0] is the final pred, outputs[-1] is the lowest resolution pred (at the bottleneck)
+                    # we're downsampling the GT to the resolution of each deepsupervision feature map output 
+                    # (instead of upsampling each deepsupervision feature map output to the final resolution)
+                    downsampled_gt = F.interpolate(y, size=logits[i].shape[-3:], mode='trilinear', align_corners=False)
+                    # print(f"downsampled_gt.shape: {downsampled_gt.shape} \t output[i].shape: {output[i].shape}")
+                    loss += (0.5 ** i) * loss_function(logits[i], downsampled_gt)
+
+                    # get probabilities from logits
+                    out = F.relu(logits[i]) / F.relu(logits[i]).max() if bool(F.relu(logits[i]).max()) else F.relu(logits[i])
+
+                    # calculate train dice
+                    train_soft_dice += dice_score(out, downsampled_gt) 
+                
+                # average dice loss across the outputs
+                loss /= len(logits)
+                train_soft_dice /= len(logits)
+
+            else:
+                # calculate training loss   
+                loss = loss_function(logits, y)
+
+                # get probabilities from logits
+                y_hat = F.relu(logits) / F.relu(logits).max() if bool(F.relu(logits).max()) else F.relu(logits)
+
+                # calculate train dice
+                train_soft_dice = dice_score(y_hat, y)
 
             epoch_loss_train += loss.item()
+            epoch_soft_dice_train += train_soft_dice.detach().cpu()
 
         scaler.scale(loss).backward()
         scaler.step(optimizer)
@@ -100,6 +134,7 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
         scheduler.step()
 
     writer.add_scalar("train/loss", scalar_value=epoch_loss_train/len(train_loader), global_step=epoch)
+    writer.add_scalar("train/dice", scalar_value=epoch_soft_dice_train/len(train_loader), global_step=epoch)
 
     return epoch_loss_train/len(train_loader)
 
@@ -109,21 +144,32 @@ def evaluate(val_loader, model, loss_function, writer, epoch, device):
 
     # set in eval mode
     model.eval()
-    epoch_loss_val = 0
+    epoch_loss_val, epoch_soft_dice_val, epoch_hard_dice_val = 0, 0, 0
 
     for step, x in enumerate(val_loader):
             
         x, y = x["image"].to(device), x["label_sc"].to(device)
 
+        # TODO: use sliding window inference here. what is this below ?!
+
         with autocast(enabled=True):
             
             logits = model(x)
+            if model.model_name == "nnunet":
+                logits = logits[0]  # take only the highest resolution output
+
             y_hat = F.relu(logits) / F.relu(logits).max() if bool(F.relu(logits).max()) else F.relu(logits)
             loss = loss_function(y_hat, y)
+            val_dice_soft = dice_score(y_hat, y)
+            val_dice_hard = dice_score((y_hat > 0.5).float(), (y > 0.5).float())
     
             epoch_loss_val += loss.item()
+            epoch_soft_dice_val += val_dice_soft
+            epoch_hard_dice_val += val_dice_hard
     
     writer.add_scalar("val/loss", scalar_value=epoch_loss_val/len(val_loader), global_step=epoch)
+    writer.add_scalar("val/dice_soft", scalar_value=epoch_soft_dice_val/len(val_loader), global_step=epoch)
+    writer.add_scalar("val/dice_hard", scalar_value=epoch_hard_dice_val/len(val_loader), global_step=epoch)
 
     return epoch_loss_val/len(val_loader)
 
@@ -226,7 +272,7 @@ def main_worker(args):
     # model
     logger.info("Building model...")
     model = BackboneModel(model_name=args.model, config=config)
-    model.run_folder = f"{model.run_folder}_datetime.now().strftime('%Y%m%d-%H%M')"
+    model.run_folder = f"{model.run_folder}_{datetime.now().strftime('%Y%m%d-%H%M')}"
     
     if args.dist:
         logger.info("Wrapping the model with Distributed Data Parallel ...")
