@@ -276,7 +276,7 @@ def main_worker(args):
         use_distributed=False,
         crop_size=config["preprocessing"]["crop_pad_size"],
         patch_size=config["preprocessing"]["patch_size"],
-        device=device,
+        device=local_rank,
         task="pretraining"
     )
 
@@ -287,9 +287,10 @@ def main_worker(args):
     
     if args.dist:
         logger.info("Wrapping the model with Distributed Data Parallel ...")
-        model = DDP(model, device_ids=[device], output_device=device, find_unused_parameters=True)
+        # the model also has to be moved to the local rank; https://github.com/pytorch/pytorch/issues/46821
+        model = DDP(model.to(local_rank), device_ids=[local_rank], output_device=local_rank)
     else:
-        model = model.to(device)
+        model = model.to(local_rank)
 
     # loss function
     logger.info("Defining loss function...") if local_rank == 0 else None
@@ -332,7 +333,7 @@ def main_worker(args):
     # run training
     logger.info("Running 'Supervised' Pre-training ...") if local_rank == 0 else None
     run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler, loss_function,
-                    writer_train, writer_val, best_loss, eval_freq, device, log_dir, args.dist)
+                    writer_train, writer_val, best_loss, eval_freq, local_rank, log_dir, args.dist)
 
     # destroy the process group explicitly
     dist.destroy_process_group()
