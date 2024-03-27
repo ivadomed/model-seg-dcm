@@ -107,9 +107,9 @@ class BackboneModel(nn.Module):
                 img_size=config["preprocessing"]["crop_pad_size"],
                 in_channels=config["model"]["swinunetr"]["in_channels"],
                 out_channels=config["model"]["swinunetr"]["out_channels"],
-                depths=config["model"]["swinunetr"]["depths"],
-                feature_size=config["model"]["swinunetr"]["feature_size"], 
-                num_heads=config["model"]["swinunetr"]["num_heads"],            
+                #depths=config["model"]["swinunetr"]["depths"],
+                #feature_size=config["model"]["swinunetr"]["feature_size"],
+                #num_heads=config["model"]["swinunetr"]["num_heads"],
             )
             self.run_folder =  f"{model_name}_seed={config['seed']}_" \
                                 f"d={config['model']['swinunetr']['depths'][0]}_" \
