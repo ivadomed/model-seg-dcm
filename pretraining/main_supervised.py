@@ -57,9 +57,10 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
     epoch_loss_train = 0
     
     epoch_iterator = tqdm(enumerate(train_loader), total=len(train_loader))
-    for step, x in enumerate(epoch_iterator):
 
-        x, y = x["image"].to(device), x["label_sc"].to(device)
+    for step, batch_data in enumerate(epoch_iterator):
+
+        x, y = batch_data["image"].to(device), batch_data["label_sc"].to(device)
         
         optimizer.zero_grad()
         with autocast(enabled=True):
