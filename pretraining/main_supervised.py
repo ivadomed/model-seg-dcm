@@ -37,7 +37,7 @@ from torch.utils.tensorboard import SummaryWriter
 from monai.utils import set_determinism
 from monai.inferers import sliding_window_inference
 
-from loss import DiceCrossEntropyLoss
+from loss import DiceCrossEntropyLoss, AdapWingLoss
 from lr_scheduler import LinearWarmupCosineAnnealingLR
 from loader import load_data
 
@@ -315,7 +315,7 @@ def main_worker(args):
 
     # loss function
     logger.info("Defining loss function...") if local_rank == 0 else None
-    loss_function = DiceCrossEntropyLoss(weight_ce=1.0, weight_dice=1.0)
+    loss_function = AdapWingLoss()
 
     # optimizers
     logger.info("Setting up the optimizer...") if local_rank == 0 else None
