@@ -165,6 +165,7 @@ def main_worker(args):
 
     device = torch.device(f"cuda:{args.local_rank}")
     torch.cuda.set_device(device)
+    logger.info(f"Using device: {device}")
     torch.backends.cudnn.benchmark = True
 
     # load config file
