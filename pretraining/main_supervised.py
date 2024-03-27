@@ -340,5 +340,7 @@ def main_worker(args):
 
 if __name__ == "__main__":
     args = get_parser().parse_args()
-    # run = setup_wandb_run(args)
-    main_worker(args) #, wandb_run=None)
+    # NOTE: The error "Cannot re-initialize CUDA in forked subprocess" can be resolved by setting the start method to 'spawn'
+    # https://github.com/pytorch/pytorch/issues/40403#issuecomment-648439409
+    torch.multiprocessing.set_start_method('spawn')
+    main_worker(args) 
