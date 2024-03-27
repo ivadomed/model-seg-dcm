@@ -5,6 +5,7 @@ from loguru import logger
 import yaml
 import sys
 from pathlib import Path
+from textwrap import dedent
 
 import torch
 import torch.nn.functional as F
@@ -20,11 +21,13 @@ from lr_scheduler import LinearWarmupCosineAnnealingLR
 from loader import load_data
 
 from models.backbone import BackboneModel
+from utils import SmartFormatter
 
 
 def get_parser():
 
-    parser = argparse.ArgumentParser(description="Supervised Pretraining on spinal cord T2w MRI data")
+    parser = argparse.ArgumentParser(description="Supervised Pretraining on spinal cord T2w MRI data",
+                                     formatter_class=SmartFormatter)
 
     parser.add_argument("--path-data", required=True, type=str,
                         help="Path to the folder containing datalist(s) for each dataset.")
@@ -37,7 +40,29 @@ def get_parser():
                         default='nnunet', type=str, 
                         help=f"Model to be used for pretraining.")
     parser.add_argument("--config", type=str, required=True,
-                        help="Path to the YAML config file containing all training details.")
+                        help="R|Path to the YAML config file containing all training details.\n"
+                             "An example of the config YAML file:\n"
+                             + dedent(
+                                """
+                                train_batch_size: 16
+                                val_batch_size: 16
+                                preprocessing:
+                                  crop_pad_size: [64, 192, 320]
+                                  patch_size: [64, 64, 64]
+                                seed: 42
+                                model:
+                                  swinunetr:
+                                    in_channels: 1
+                                    out_channels: 1
+                                opt:
+                                  name: adamw
+                                  lr: 0.0004
+                                  batch_size: 16
+                                  warmup_epochs: 10
+                                  max_epochs: 500
+                                  check_val_every_n_epochs: 2\n
+                                """)
+                        )
     parser.add_argument("-rfc", "--resume-from-checkpoint", action="store_true",
                         help="Resume training from checkpoint.")
     parser.add_argument("--run-dir", help="Location of model to resume.")
