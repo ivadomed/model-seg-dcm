@@ -173,7 +173,7 @@ def main_worker(args):
         logger.info(f"Loaded config file: {args.config}")
 
     # for reproducibility purposes set a seed
-    set_determinism(config["autoencoderkl"]["seed"])
+    set_determinism(config["seed"])
 
     # No datalists manually provided --> load all datalists in the folder
     if args.datalists is None:
