@@ -5,9 +5,7 @@ from loguru import logger
 import yaml
 import sys
 from pathlib import Path
-from datetime import datetime
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.distributed as dist
