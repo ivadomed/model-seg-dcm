@@ -201,9 +201,7 @@ def main_worker(args):
     # model
     logger.info("Building model...")
     model = BackboneModel(model_name=args.model, config=config)
-    run_folder = model.run_folder
-
-    run_folder = f"{run_folder}_datetime.now().strftime('%Y%m%d-%H%M')"
+    model.run_folder = f"{model.run_folder}_datetime.now().strftime('%Y%m%d-%H%M')"
     
     if args.dist:
         logger.info("Wrapping the model with Distributed Data Parallel ...")
