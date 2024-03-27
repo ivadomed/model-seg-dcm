@@ -192,16 +192,16 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
     
     # validation sanity check
     val_loss = evaluate(val_loader, model, loss_function, writer_val, epoch=0, device=device)
-    logger.info(f"Epoch 0 --> Validation Loss: {val_loss:.3f}")
+    logger.info(f"Epoch 0 --> Validation Loss: {val_loss:.3f}") if local_rank == 0 else None
 
     for epoch in range(n_epochs):
         train_loss = train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_function, 
                                      scaler, writer_train, device)
-        logger.info(f"Epoch {epoch+1}/{n_epochs} --> Training Loss: {train_loss:.3f}")
+        logger.info(f"Epoch {epoch+1}/{n_epochs} --> Training Loss: {train_loss:.3f}") if local_rank == 0 else None
 
         if (epoch + 1) % eval_freq == 0:
             val_loss = evaluate(val_loader, model, loss_function, writer_val, epoch, device)
-            logger.info(f"Epoch {epoch+1} --> Validation Loss: {val_loss:.3f}")
+            logger.info(f"Epoch {epoch+1} --> Validation Loss: {val_loss:.3f}") if local_rank == 0 else None
         
         if val_loss < best_loss:
             best_loss = val_loss
@@ -231,7 +231,7 @@ def main_worker(args):
     logger.add(str(log_dir / "log.txt"), rotation="10 MB", level="INFO")
 
     # disable logging for processes except 0 on every node
-    if args.local_rank != 0:
+    if local_rank != 0:
         f = open(os.devnull, "w")
         sys.stdout = sys.stderr = f
 
@@ -252,7 +252,7 @@ def main_worker(args):
     # load config file
     with open(args.config, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-        logger.info(f"Loaded config file: {args.config}")
+        logger.info(f"Loaded config file: {args.config}") if local_rank == 0 else None
 
     # for reproducibility purposes set a seed
     set_determinism(config["seed"])
@@ -262,12 +262,12 @@ def main_worker(args):
         datalists_list = [f for f in os.listdir(args.path_data) if f.endswith(".json")]
     else:
         datalists_list = args.datalists
-    logger.info(f"The following datalists will be used: {datalists_list}")
+    logger.info(f"The following datalists will be used: {datalists_list}") if local_rank == 0 else None
 
     # Get absolute path to the datalists
     datalists_list = [os.path.join(args.path_data, f) for f in datalists_list]
 
-    logger.info("Getting data...")
+    logger.info("Getting data...") if local_rank == 0 else None
     train_loader, val_loader = load_data(
         datalists_paths=datalists_list,
         train_batch_size=config["train_batch_size"],
@@ -281,7 +281,7 @@ def main_worker(args):
     )
 
     # model
-    logger.info("Building model...")
+    logger.info("Building model...") if local_rank == 0 else None
     model = BackboneModel(model_name=args.model, config=config)
     model.run_folder = f"{model.run_folder}_{datetime.now().strftime('%Y%m%d-%H%M')}"
     
@@ -292,11 +292,11 @@ def main_worker(args):
         model = model.to(device)
 
     # loss function
-    logger.info("Defining loss function...")
+    logger.info("Defining loss function...") if local_rank == 0 else None
     loss_function = DiceCrossEntropyLoss(weight_ce=1.0, weight_dice=1.0)
 
     # optimizers
-    logger.info("Setting up the optimizer...")
+    logger.info("Setting up the optimizer...") if local_rank == 0 else None
     if config["opt"]["name"] == "adam":
         optimizer = optim.Adam(model.parameters(), lr=config["opt"]["lr"], fused=True)
     elif config["opt"]["name"] == "adamw":
@@ -318,19 +318,19 @@ def main_worker(args):
     # Get Checkpoint
     best_loss = float("inf")
     if args.resume_from_checkpoint:
-        logger.info(f"Using existing checkpoint ...")
+        logger.info(f"Using existing checkpoint ...") if local_rank == 0 else None
         checkpoint = torch.load(str(log_dir / "models" / "checkpoint.pth"))
         model.load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         start_epoch = checkpoint["epoch"]
         best_loss = checkpoint["best_loss"]
     else:
-        logger.info(f"No checkpoint found.")
+        logger.info(f"No checkpoint found.") if local_rank == 0 else None
 
     n_epochs = config["opt"]["max_epochs"]
     eval_freq = config["opt"]["check_val_every_n_epochs"]
     # run training
-    logger.info("Running 'Supervised' Pre-training ...")
+    logger.info("Running 'Supervised' Pre-training ...") if local_rank == 0 else None
     run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler, loss_function,
                     writer_train, writer_val, best_loss, eval_freq, device, log_dir, args.dist)
 
