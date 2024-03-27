@@ -18,7 +18,9 @@ def train_transforms(crop_size, patch_size, device="cuda", task="pretraining"):
             transforms.CropForegroundd(keys=all_keys, source_key="image"),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size),
             # convert the data to Tensor without meta, move to GPU and cache it to avoid CPU -> GPU sync in every epoch
-            transforms.EnsureTyped(keys=all_keys, device=device, track_meta=False),
+            # NOTE: moving to GPU and caching is not supported with multiprocessing -- leads to weird RunTimeErrors.
+            # hence, only disabling meta tensor tracking
+            transforms.EnsureTyped(keys=all_keys, track_meta=False),
             # sample patches from cropped image
             transforms.RandCropByPosNegLabeld(keys=all_keys,
                                               label_key="label_sc",  # cropping around the SC
@@ -62,8 +64,7 @@ def train_transforms(crop_size, patch_size, device="cuda", task="pretraining"):
             transforms.Spacingd(keys=all_keys, pixdim=(1.0, 1.0, 1.0), mode=(2, 1, 1)),
             transforms.NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size, ),
-            # convert the data to Tensor without meta, move to GPU and cache it to avoid CPU -> GPU sync in every epoch
-            transforms.EnsureTyped(keys=all_keys, device=device, track_meta=False),
+            transforms.EnsureTyped(keys=all_keys, track_meta=False),
             # data-augmentation
             # transforms.RandAffined(keys=all_keys, mode=(2, 1), prob=0.9,
             #             rotate_range=(-20. / 360 * 2. * np.pi, 20. / 360 * 2. * np.pi),    # monai expects in radians 
