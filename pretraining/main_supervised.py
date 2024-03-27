@@ -5,9 +5,8 @@ from loguru import logger
 import yaml
 import sys
 from pathlib import Path
-from datetime import datetime
+from textwrap import dedent
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.distributed as dist
@@ -22,31 +21,55 @@ from lr_scheduler import LinearWarmupCosineAnnealingLR
 from loader import load_data
 
 from models.backbone import BackboneModel
+from utils import SmartFormatter
 
 
 def get_parser():
 
-    parser = argparse.ArgumentParser(description="Supervised Pretraining on spinal cord T2w MRI data")
+    parser = argparse.ArgumentParser(description="Supervised Pretraining on spinal cord T2w MRI data",
+                                     formatter_class=SmartFormatter)
 
-    parser.add_argument('--path-data', nargs='+', required=True, type=str,
-                            help='Path to the folder containing datalists for each dataset.')
-    parser.add_argument("--path-out", type=str, help="Path to the output directory.")
-    
+    parser.add_argument("--path-data", required=True, type=str,
+                        help="Path to the folder containing datalist(s) for each dataset.")
+    parser.add_argument("--datalists", nargs="+", type=str, default=None,
+                        help="List of JSON datalist(s) for each dataset. If not provided (None), all datalists in the "
+                             "'--path-data' folder will be used. Default: None.")
+    parser.add_argument("--path-out", type=str, required=True,
+                        help="Path to the output directory. The model and the log will be saved here.")
     parser.add_argument('-m', '--model', choices=['nnunet', 'monai-unet', 'unetr', 'swinunetr'], 
                         default='nnunet', type=str, 
                         help=f"Model to be used for pretraining.")
-
     parser.add_argument("--config", type=str, required=True,
-                        help="Path to the config file containing all training details.")
+                        help="R|Path to the YAML config file containing all training details.\n"
+                             "An example of the config YAML file:\n"
+                             + dedent(
+                                """
+                                train_batch_size: 16
+                                val_batch_size: 16
+                                preprocessing:
+                                  crop_pad_size: [64, 192, 320]
+                                  patch_size: [64, 64, 64]
+                                seed: 42
+                                model:
+                                  swinunetr:
+                                    in_channels: 1
+                                    out_channels: 1
+                                opt:
+                                  name: adamw
+                                  lr: 0.0004
+                                  batch_size: 16
+                                  warmup_epochs: 10
+                                  max_epochs: 500
+                                  check_val_every_n_epochs: 2\n
+                                """)
+                        )
     parser.add_argument("-rfc", "--resume-from-checkpoint", action="store_true",
                         help="Resume training from checkpoint.")
-    parser.add_argument("--run_dir", help="Location of model to resume.")
+    parser.add_argument("--run-dir", help="Location of model to resume.")
     parser.add_argument("--debug", action="store_true", help="Debug mode")
-
     parser.add_argument("--dist", action="store_true", default=False,
                         help="Use distributed training")
     parser.add_argument("--local-rank", type=int, default=0)
-
 
     return parser
 
@@ -57,9 +80,10 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
     epoch_loss_train = 0
     
     epoch_iterator = tqdm(enumerate(train_loader), total=len(train_loader))
-    for step, x in enumerate(epoch_iterator):
 
-        x, y = x["image"].to(device), x["label_sc"].to(device)
+    for step, batch_data in enumerate(epoch_iterator):
+
+        x, y = batch_data["image"].to(device), batch_data["label_sc"].to(device)
         
         optimizer.zero_grad()
         with autocast(enabled=True):
@@ -79,7 +103,8 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
 
     return epoch_loss_train/len(train_loader)
 
-@torch.no_grad()
+
+@torch.no_grad()    # this decorator disables gradient tracking
 def evaluate(val_loader, model, loss_function, writer, epoch, device):
 
     # set in eval mode
@@ -109,7 +134,7 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
     scaler = GradScaler()
     
     # validation sanity check
-    val_loss = evaluate(val_loader, model, loss_function, writer_val, start_epoch=0, device=device)
+    val_loss = evaluate(val_loader, model, loss_function, writer_val, epoch=0, device=device)
     logger.info(f"Epoch 0 --> Validation Loss: {val_loss:.3f}")
 
     for epoch in range(n_epochs):
@@ -144,6 +169,10 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
 
 def main_worker(args):
 
+    # save output to a log file
+    log_dir = Path(args.path_out)
+    logger.add(str(log_dir / "log.txt"), rotation="10 MB", level="INFO")
+
     # disable logging for processes except 0 on every node
     if args.local_rank != 0:
         f = open(os.devnull, "w")
@@ -153,31 +182,41 @@ def main_worker(args):
         # initialize the distributed training process, every GPU runs in a process
         # strongly recommended to use ``init_method=env://`` with NCCL backend
         dist.init_process_group(backend="nccl", init_method="env://")
-        logger.info(f"Training in distributed mode with multiple processes, 1 GPU per process." 
+        logger.info(f"Training in distributed mode with multiple processes, 1 GPU per process."
                     f"Process {torch.distributed.get_rank()}, Total {torch.distributed.get_world_size()}.")
     else:
         logger.info("Training with a single process on 1 GPU.")
-    
+
     device = torch.device(f"cuda:{args.local_rank}")
     torch.cuda.set_device(device)
+    logger.info(f"Using device: {device}")
     torch.backends.cudnn.benchmark = True
-    
+
     # load config file
     with open(args.config, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
+        logger.info(f"Loaded config file: {args.config}")
 
     # for reproducibility purposes set a seed
-    set_determinism(config["autoencoderkl"]["seed"])
+    set_determinism(config["seed"])
 
-    log_dir = Path(args.path_out)
+    # No datalists manually provided --> load all datalists in the folder
+    if args.datalists is None:
+        datalists_list = [f for f in os.listdir(args.path_data) if f.endswith(".json")]
+    else:
+        datalists_list = args.datalists
+    logger.info(f"The following datalists will be used: {datalists_list}")
+
+    # Get absolute path to the datalists
+    datalists_list = [os.path.join(args.path_data, f) for f in datalists_list]
 
     logger.info("Getting data...")
     train_loader, val_loader = load_data(
-        datalists_path=os.path.join(args.path_data[0], "dataset_finetuning_dcm_lesions_seed42.json"),
+        datalists_paths=datalists_list,
         train_batch_size=config["train_batch_size"],
         val_batch_size=config["val_batch_size"],
         num_workers=8,
-        use_distributed=True,
+        use_distributed=False,
         crop_size=config["preprocessing"]["crop_pad_size"],
         patch_size=config["preprocessing"]["patch_size"],
         device=device,
@@ -187,9 +226,7 @@ def main_worker(args):
     # model
     logger.info("Building model...")
     model = BackboneModel(model_name=args.model, config=config)
-    run_folder = model.run_folder
-
-    run_folder = f"{run_folder}_datetime.now().strftime('%Y%m%d-%H%M')"
+    model.run_folder = f"{model.run_folder}_datetime.now().strftime('%Y%m%d-%H%M')"
     
     if args.dist:
         logger.info("Wrapping the model with Distributed Data Parallel ...")
@@ -247,4 +284,4 @@ def main_worker(args):
 if __name__ == "__main__":
     args = get_parser().parse_args()
     # run = setup_wandb_run(args)
-    main_worker(args, wandb_run=None)
+    main_worker(args) #, wandb_run=None)

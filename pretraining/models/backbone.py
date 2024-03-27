@@ -11,7 +11,7 @@ from dynamic_network_architectures.architectures.unet import PlainConvUNet, Resi
 from dynamic_network_architectures.building_blocks.helper import get_matching_instancenorm, convert_dim_to_conv_op
 from dynamic_network_architectures.initialization.weight_init import init_last_bn_before_add_to_0
 
-from model_utils import InitWeights_He, count_parameters
+from models.model_utils import InitWeights_He, count_parameters
 
 
 
@@ -107,9 +107,9 @@ class BackboneModel(nn.Module):
                 img_size=config["preprocessing"]["crop_pad_size"],
                 in_channels=config["model"]["swinunetr"]["in_channels"],
                 out_channels=config["model"]["swinunetr"]["out_channels"],
-                depths=config["model"]["swinunetr"]["depths"],
-                feature_size=config["model"]["swinunetr"]["feature_size"], 
-                num_heads=config["model"]["swinunetr"]["num_heads"],            
+                #depths=config["model"]["swinunetr"]["depths"],
+                #feature_size=config["model"]["swinunetr"]["feature_size"],
+                #num_heads=config["model"]["swinunetr"]["num_heads"],
             )
             self.run_folder =  f"{model_name}_seed={config['seed']}_" \
                                 f"d={config['model']['swinunetr']['depths'][0]}_" \
