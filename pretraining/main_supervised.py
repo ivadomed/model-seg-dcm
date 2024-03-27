@@ -110,7 +110,7 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
     scaler = GradScaler()
     
     # validation sanity check
-    val_loss = evaluate(val_loader, model, loss_function, writer_val, start_epoch=0, device=device)
+    val_loss = evaluate(val_loader, model, loss_function, writer_val, epoch=0, device=device)
     logger.info(f"Epoch 0 --> Validation Loss: {val_loss:.3f}")
 
     for epoch in range(n_epochs):
