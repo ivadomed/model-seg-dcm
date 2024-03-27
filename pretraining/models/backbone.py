@@ -11,7 +11,7 @@ from dynamic_network_architectures.architectures.unet import PlainConvUNet, Resi
 from dynamic_network_architectures.building_blocks.helper import get_matching_instancenorm, convert_dim_to_conv_op
 from dynamic_network_architectures.initialization.weight_init import init_last_bn_before_add_to_0
 
-from model_utils import InitWeights_He, count_parameters
+from models.models.model_utils import InitWeights_He, count_parameters
 
 
 
