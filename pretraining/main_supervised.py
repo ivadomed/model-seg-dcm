@@ -85,7 +85,12 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
     
     epoch_iterator = tqdm(enumerate(train_loader), total=len(train_loader))
 
-    for step, batch_data in enumerate(epoch_iterator):
+    if isinstance(model, DDP):
+        # NOTE: if the model is wrapped around DDP, then it has to be unwrapped to access the model's attributes
+        # https://github.com/huggingface/transformers/issues/18974 
+        model = model.module
+
+    for step, batch_data in epoch_iterator:
 
         x, y = batch_data["image"].to(device), batch_data["label_sc"].to(device)
         
@@ -147,7 +152,10 @@ def evaluate(val_loader, model, loss_function, writer, epoch, device):
     model.eval()
     epoch_loss_val, epoch_soft_dice_val, epoch_hard_dice_val = 0, 0, 0
 
-    for step, x in enumerate(val_loader):
+    if isinstance(model, DDP):
+        # NOTE: if the model is wrapped around DDP, then it has to be unwrapped to access the model's attributes
+        model = model.module
+
             
         x, y = x["image"].to(device), x["label_sc"].to(device)
 
