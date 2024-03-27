@@ -1,3 +1,22 @@
+"""
+Script to run supervised pretraining on large-scale spinal cord T2w MRI. Datasets are expected to be in MSD-style format.
+All the training details are provided in a YAML config file. The script supports distributed training on multiple GPUs.
+
+Usage:
+    (1) To run on multiple (two) GPU:
+    CUDA_VISIBLE_DEVICES=0,3 torchrun --standalone --nnodes=1 --nproc-per-node=2 pretraining/main_supervised.py 
+        --path-data ~/dcm-seg/datalists_debug --path-out ~/dcm-seg/results --model swinunetr 
+        --config ~/dcm-seg/model-seg-dcm/configs/train_supervised.yaml --dist
+    
+    (2) To run on a single GPU:
+    CUDA_VISIBLE_DEVICES=0 torchrun --standalone --nnodes=1 --nproc-per-node=1 pretraining/main_supervised.py 
+        --path-data ~/dcm-seg/datalists_debug --path-out ~/dcm-seg/results --model swinunetr 
+        --config ~/dcm-seg/model-seg-dcm/configs/train_supervised.yaml --dist
+
+More info on torchrun: https://pytorch.org/docs/stable/elastic/run.html#launcher-api
+        
+"""
+
 import argparse
 import os
 from tqdm import tqdm
