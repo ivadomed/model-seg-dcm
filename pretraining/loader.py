@@ -23,8 +23,8 @@ def load_data(datalists_paths, train_batch_size, val_batch_size, num_workers=8, 
         train_datalist += load_decathlon_datalist(data_list_file_path=datalist_path, data_list_key="training")
         val_datalist += load_decathlon_datalist(data_list_file_path=datalist_path, data_list_key="validation")
 
-    train_tfs = train_transforms(crop_size, patch_size, device=device, mode=task)
-    val_tfs = val_transforms(crop_size, mode=task)
+    train_tfs = train_transforms(crop_size, patch_size, device=device, task=task)
+    val_tfs = val_transforms(crop_size, task=task)
 
     # training dataset
     train_ds = CacheDataset(data=train_datalist, transform=train_tfs, cache_rate=0.5, num_workers=8)

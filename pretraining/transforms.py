@@ -2,8 +2,8 @@ import numpy as np
 import monai.transforms as transforms
 
 
-def train_transforms(crop_size, patch_size, device="cuda", mode="pretraining"):
-    if mode == "pretraining":
+def train_transforms(crop_size, patch_size, device="cuda", task="pretraining"):
+    if task == "pretraining":
         # NOTE: the pre-trainining is done for SC segmentation
         all_keys = ["image", "label_sc"]
 
@@ -49,7 +49,7 @@ def train_transforms(crop_size, patch_size, device="cuda", mode="pretraining"):
             # this is nnUNet's BrightnessMultiplicativeTransform
             transforms.RandFlipd(keys=all_keys, prob=0.3, ),
         ]
-    elif mode == "finetuning":
+    elif task == "finetuning":
 
         # NOTE: the fine-tuning is done for lesion segmentation
         all_keys = ["image", "label_sc", "label_lesion"]
@@ -82,13 +82,13 @@ def train_transforms(crop_size, patch_size, device="cuda", mode="pretraining"):
             transforms.RandFlipd(keys=all_keys, prob=0.3, ),
         ]
     else:
-        raise ValueError(f"Invalid mode: {mode}. Choices: [pretraining, finetuning]")
+        raise ValueError(f"Invalid task: {task}. Choices: [pretraining, finetuning]")
 
     return transforms.Compose(monai_transforms)
 
 
-def val_transforms(crop_size, mode="pretraining"):
-    if mode == "pretraining":
+def val_transforms(crop_size, task="pretraining"):
+    if task == "pretraining":
         all_keys = ["image", "label_sc"]
         return transforms.Compose([
             transforms.LoadImaged(keys=all_keys, image_only=False),
@@ -98,7 +98,7 @@ def val_transforms(crop_size, mode="pretraining"):
             transforms.NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size, ),
         ])
-    elif mode == "finetuning":
+    elif task == "finetuning":
         all_keys = ["image", "label_sc", "label_lesion"]
         return transforms.Compose([
             transforms.LoadImaged(keys=all_keys, image_only=False),
@@ -109,7 +109,7 @@ def val_transforms(crop_size, mode="pretraining"):
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size, ),
         ])
     else:
-        raise ValueError(f"Invalid mode: {mode}. Choices: [pretraining, finetuning]")
+        raise ValueError(f"Invalid task: {task}. Choices: [pretraining, finetuning]")
 
 
 def inference_transforms(crop_size, lbl_key="label"):
