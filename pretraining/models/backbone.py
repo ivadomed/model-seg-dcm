@@ -108,9 +108,9 @@ class BackboneModel(nn.Module):
                 img_size=config["preprocessing"]["crop_pad_size"],
                 in_channels=config["model"]["swinunetr"]["in_channels"],
                 out_channels=config["model"]["swinunetr"]["out_channels"],
-                #depths=config["model"]["swinunetr"]["depths"],
-                #feature_size=config["model"]["swinunetr"]["feature_size"],
-                #num_heads=config["model"]["swinunetr"]["num_heads"],
+                depths=config["model"]["swinunetr"]["depths"],
+                feature_size=config["model"]["swinunetr"]["feature_size"],
+                num_heads=config["model"]["swinunetr"]["num_heads"],
             )
             self.run_folder =  f"{model_name}_seed={config['seed']}_" \
                                 f"d={config['model']['swinunetr']['depths'][0]}_" \
@@ -148,7 +148,7 @@ class BackboneModel(nn.Module):
             raise ValueError(f"Model {model_name} not supported.")
 
         trainable_params = count_parameters(self.model)
-        logger.info(f"Model {model_name} created with {(trainable_params / 1e6):.3f} trainable parameters.")
+        logger.info(f"Model {model_name} created with {(trainable_params / 1e6):.2f}M trainable parameters.")
 
     def load_pretrained(self, path_pretrained_weights):
 
