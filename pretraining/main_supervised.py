@@ -26,6 +26,7 @@ from models.backbone import BackboneModel
 from utils import SmartFormatter
 
 torch.multiprocessing.set_sharing_strategy('file_system')
+local_rank = int(os.environ["LOCAL_RANK"])
 
 def get_parser():
 
@@ -72,7 +73,6 @@ def get_parser():
     parser.add_argument("--debug", action="store_true", help="Debug mode")
     parser.add_argument("--dist", action="store_true", default=False,
                         help="Use distributed training")
-    parser.add_argument("--local-rank", type=int, default=0)
 
     return parser
 
