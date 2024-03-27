@@ -3,9 +3,9 @@ import numpy as np
 import monai.transforms as transforms
 
 
-def train_transforms(crop_size, patch_size, device="cuda", type="pretraining"):
+def train_transforms(crop_size, patch_size, device="cuda", mode="pretraining"):
 
-    if type == "pretraining":
+    if mode == "pretraining":
         # NOTE: the pre-trainining is done for SC segmentation
         all_keys = ["image", "label_sc"]
         
@@ -47,7 +47,7 @@ def train_transforms(crop_size, patch_size, device="cuda", type="pretraining"):
             transforms.RandScaleIntensityd(keys=["image"], factors=(-0.25, 1), prob=0.15),  # this is nnUNet's BrightnessMultiplicativeTransform
             transforms.RandFlipd(keys=all_keys, prob=0.3,),
         ]
-    elif type == "finetuning":
+    elif mode == "finetuning":
 
         # NOTE: the fine-tuning is done for lesion segmentation
         all_keys = ["image", "label_sc", "label_lesion"]
@@ -94,9 +94,9 @@ def inference_transforms(crop_size, lbl_key="label"):
             transforms.NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
         ])
 
-def val_transforms(crop_size, type="pretraining"):
+def val_transforms(crop_size, mode="pretraining"):
 
-    if type == "pretraining":
+    if mode == "pretraining":
         all_keys = ["image", "label_sc"]
 
         return transforms.Compose([
@@ -107,7 +107,7 @@ def val_transforms(crop_size, type="pretraining"):
             transforms.NormalizeIntensityd(keys=["image"], nonzero=False, channel_wise=False),
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size,),
         ])
-    elif type == "finetuning":
+    elif mode == "finetuning":
         all_keys = ["image", "label_sc", "label_lesion"]
         return transforms.Compose([
             transforms.LoadImaged(keys=all_keys, image_only=False),
