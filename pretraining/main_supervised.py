@@ -259,4 +259,4 @@ def main_worker(args):
 if __name__ == "__main__":
     args = get_parser().parse_args()
     # run = setup_wandb_run(args)
-    main_worker(args, wandb_run=None)
+    main_worker(args) #, wandb_run=None)
