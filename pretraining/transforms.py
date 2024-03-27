@@ -82,7 +82,7 @@ def train_transforms(crop_size, patch_size, device="cuda", mode="pretraining"):
             transforms.RandFlipd(keys=all_keys, prob=0.3, ),
         ]
     else:
-        raise ValueError("Invalid type: {}. Choices: [pretraining, finetuning]".format(type))
+        raise ValueError(f"Invalid mode: {mode}. Choices: [pretraining, finetuning]")
 
     return transforms.Compose(monai_transforms)
 
@@ -105,7 +105,6 @@ def inference_transforms(crop_size, lbl_key="label"):
 def val_transforms(crop_size, mode="pretraining"):
     if mode == "pretraining":
         all_keys = ["image", "label_sc"]
-
         return transforms.Compose([
             transforms.LoadImaged(keys=all_keys, image_only=False),
             transforms.EnsureChannelFirstd(keys=all_keys),
@@ -125,4 +124,4 @@ def val_transforms(crop_size, mode="pretraining"):
             transforms.ResizeWithPadOrCropd(keys=all_keys, spatial_size=crop_size, ),
         ])
     else:
-        raise ValueError("Invalid type: {}. Choices: [pretraining, finetuning]".format(type))
+        raise ValueError(f"Invalid mode: {mode}. Choices: [pretraining, finetuning]")
