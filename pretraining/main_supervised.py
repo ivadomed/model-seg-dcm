@@ -39,7 +39,7 @@ def get_parser():
                              "'--path-data' folder will be used. Default: None.")
     parser.add_argument("--path-out", type=str, required=True,
                         help="Path to the output directory. The model and the log will be saved here.")
-    parser.add_argument('-m', '--model', choices=['nnunet', 'monai-unet', 'unetr', 'swinunetr'], 
+    parser.add_argument('-m', '--model', choices=['nnunet', 'monai-unet', 'swinunetr'], 
                         default='nnunet', type=str, 
                         help=f"Model to be used for pretraining.")
     parser.add_argument("--config", type=str, required=True,
