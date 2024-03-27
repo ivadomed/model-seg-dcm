@@ -191,7 +191,7 @@ def main_worker(args):
         train_batch_size=config["train_batch_size"],
         val_batch_size=config["val_batch_size"],
         num_workers=8,
-        use_distributed=True,
+        use_distributed=False,
         crop_size=config["preprocessing"]["crop_pad_size"],
         patch_size=config["preprocessing"]["patch_size"],
         device=device,
