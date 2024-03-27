@@ -1,7 +1,4 @@
-import os
-
-from monai.data import (DataLoader, Dataset, list_data_collate, DistributedSampler,
-                        CacheDataset, load_decathlon_datalist)
+from monai.data import (DataLoader, DistributedSampler, CacheDataset, load_decathlon_datalist)
 
 from transforms import train_transforms, val_transforms
 
