@@ -1,3 +1,6 @@
+train_batch_size: 16
+val_batch_size: 16
+
 seed: 30
 save_test_preds: True
 
