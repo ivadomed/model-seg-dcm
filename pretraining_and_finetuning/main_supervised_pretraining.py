@@ -77,13 +77,16 @@ def get_parser():
                                   swinunetr:
                                     in_channels: 1
                                     out_channels: 1
+                                    depths: [2, 2, 2, 2]
+                                    num_heads: [3, 6, 12, 24]   # number of heads in multi-head Attention
+                                    feature_size: 36
                                 opt:
-                                  name: adamw
-                                  lr: 0.0004
-                                  batch_size: 16
-                                  warmup_epochs: 10
-                                  max_epochs: 500
-                                  check_val_every_n_epochs: 2\n
+                                  name: adam
+                                  lr: 0.0001
+                                  batch_size: 2
+                                  warmup_epochs: 20
+                                  max_epochs: 200
+                                  check_val_every_n_epochs: 1\n
                                 """)
                         )
     parser.add_argument("-rfc", "--resume-from-checkpoint", action="store_true",
