@@ -77,6 +77,9 @@ def get_parser():
                                   swinunetr:
                                     in_channels: 1
                                     out_channels: 1
+                                    depths: [2, 2, 2, 2]
+                                    num_heads: [3, 6, 12, 24]   # number of heads in multi-head Attention
+                                    feature_size: 36
                                 opt:
                                   name: adamw
                                   lr: 0.0004
