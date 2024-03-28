@@ -36,6 +36,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 from monai.utils import set_determinism
 from monai.inferers import sliding_window_inference
+import matplotlib.pyplot as plt
 
 from loss import DiceCrossEntropyLoss, AdapWingLoss
 from lr_scheduler import LinearWarmupCosineAnnealingLR
@@ -167,7 +168,7 @@ def train_one_epoch(train_loader, model, optimizer, scheduler, epoch, loss_funct
 
 
 @torch.no_grad()    # this decorator disables gradient tracking
-def evaluate(val_loader, model, loss_function, writer, epoch, device):
+def evaluate(val_loader, model, loss_function, writer, log_dir, epoch, device):
 
     # set in eval mode
     model.eval()
@@ -197,6 +198,32 @@ def evaluate(val_loader, model, loss_function, writer, epoch, device):
             epoch_loss_val += loss.item()
             epoch_soft_dice_val += val_dice_soft
             epoch_hard_dice_val += val_dice_hard
+
+            # Plot and save input and output validation images to see how the model is learning
+            if step == 0:
+                plt.figure()
+                plt.subplot(3, 1, 1)
+                logger.info(f'Input image shape: {x.detach().cpu().numpy().shape}')
+                plt.imshow(x[0, 0, :, :, 100].detach().cpu().numpy(), cmap="gray")
+                plt.title("Input Image")
+                plt.subplot(3, 1, 2)
+                logger.info(f'Ground truth shape: {y.detach().cpu().numpy().shape}')
+                plt.imshow(x[0, 0, :, :, 100].detach().cpu().numpy(), cmap="gray")
+                plt.imshow((y > 0.5).float()[0, 0, :, :, 100].detach().cpu().numpy(), alpha=0.5, cmap="jet",
+                           interpolation='nearest')
+                plt.title("Ground Truth")
+                plt.subplot(3, 1, 3)
+                logger.info(f'Prediction shape: {y_hat.detach().cpu().numpy().shape}')
+                plt.imshow(x[0, 0, :, :, 100].detach().cpu().numpy(), cmap="gray")
+                plt.imshow((y_hat > 0.5).float()[0, 0, :, :, 100].detach().cpu().numpy(), alpha=0.5, cmap="jet",
+                           interpolation='nearest')
+                plt.title("Prediction")
+                plt.tight_layout()
+
+                fname = os.path.join(log_dir, "val_figures", f"val_{epoch:05d}_{step}.png")
+                plt.savefig(fname)
+                plt.close()
+                logger.info(f"Saved validation image to {fname}")
     
     writer.add_scalar("val/loss", scalar_value=epoch_loss_val/len(val_loader), global_step=epoch)
     writer.add_scalar("val/dice_soft", scalar_value=epoch_soft_dice_val/len(val_loader), global_step=epoch)
@@ -211,7 +238,7 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
     scaler = GradScaler()
     
     # validation sanity check
-    val_loss = evaluate(val_loader, model, loss_function, writer_val, epoch=0, device=device)
+    val_loss = evaluate(val_loader, model, loss_function, writer_val, log_dir, epoch=0, device=device)
     logger.info(f"Epoch 0 --> Validation Loss: {val_loss:.3f}") if local_rank == 0 else None
 
     for epoch in range(n_epochs):
@@ -220,7 +247,7 @@ def run_training(model, train_loader, val_loader, n_epochs, optimizer, scheduler
         logger.info(f"Epoch {epoch+1}/{n_epochs} --> Training Loss: {train_loss:.3f}") if local_rank == 0 else None
 
         if (epoch + 1) % eval_freq == 0:
-            val_loss = evaluate(val_loader, model, loss_function, writer_val, epoch, device)
+            val_loss = evaluate(val_loader, model, loss_function, writer_val, log_dir, epoch, device)
             logger.info(f"Epoch {epoch+1} --> Validation Loss: {val_loss:.3f}") if local_rank == 0 else None
         
         if val_loss < best_loss:
@@ -308,7 +335,8 @@ def main_worker(args):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
         os.makedirs(log_dir / "models", exist_ok=True)  # to save model checkpoints
-    
+        os.makedirs(log_dir / "val_figures", exist_ok=True)     # to save validation figures
+
     if args.dist:
         logger.info("Wrapping the model with Distributed Data Parallel ...")
         # the model also has to be moved to the local rank; https://github.com/pytorch/pytorch/issues/46821
