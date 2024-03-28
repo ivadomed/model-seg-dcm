@@ -2,9 +2,7 @@ seed: 30
 save_test_preds: True
 
 preprocessing:
-  # Online resampling of images to the specified spacing.
-  spacing: [1.0, 1.0, 1.0]
-  # Center crop/pad images to the specified size. (NOTE: done after resampling)
+  # Center crop/pad images to the specified size. (NOTE: done after resampling to 1.0x1.0x1.0)
   # values correspond to R-L, A-P, I-S axes of the image after 1mm isotropic resampling.
   crop_pad_size: [64, 192, 320]
   patch_size: [64, 64, 64]
