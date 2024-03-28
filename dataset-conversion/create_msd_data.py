@@ -28,6 +28,7 @@ from sklearn.model_selection import train_test_split
 
 contrast_dict = {
     'spine-generic': 'space-other_T2w',     # iso T2w (preprocessed data)
+    'whole-spine': 'T2w',                   # iso T2w
     'canproco': 'ses-M0_T2w',               # iso T2w (session M0)
     'dcm-zurich': 'acq-axial_T2w',          # axial T2w
     'sci-paris': 'T2w',                     # iso T2w
@@ -37,6 +38,7 @@ contrast_dict = {
 # Spinal cord segmentation file suffixes for different datasets
 sc_fname_suffix_dict = {
     'spine-generic': 'label-SC_seg',
+    'whole-spine': 'seg',
     'canproco': 'seg-manual',
     'dcm-zurich': 'label-SC_mask-manual',
     'sci-paris': 'seg-manual',
