@@ -259,7 +259,7 @@ def main_worker(args):
         # initialize the distributed training process, every GPU runs in a process
         # strongly recommended to use ``init_method=env://`` with NCCL backend
         dist.init_process_group(backend="nccl", init_method="env://")
-        logger.info(f"Training in distributed mode with multiple processes, 1 GPU per process."
+        logger.info(f"Training in distributed mode with multiple processes, 1 GPU per process. "
                     f"Process {torch.distributed.get_rank()}, Total {torch.distributed.get_world_size()}.")
     else:
         logger.info("Training with a single process on 1 GPU.")
