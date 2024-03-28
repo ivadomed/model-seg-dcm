@@ -1,0 +1,50 @@
+seed: 30
+save_test_preds: True
+
+preprocessing:
+  # Center crop/pad images to the specified size. (NOTE: done after resampling to 1.0x1.0x1.0)
+  # values correspond to R-L, A-P, I-S axes of the image after 1mm isotropic resampling.
+  # NOTE for swinunetr: spatial dimensions of input image must be divisible by 32, i.e., we cannot you, for example, 48x48x48
+  crop_pad_size: [64, 192, 320]
+  patch_size: [64, 64, 64]
+
+opt:
+  name: adam
+  lr: 0.001
+  max_epochs: 200
+  warmup_epochs: 20
+  batch_size: 2
+  # Interval between validation checks in epochs
+  check_val_every_n_epochs: 1
+  # Early stopping patience (this is until patience * check_val_every_n_epochs)
+  early_stopping_patience: 20     
+
+
+model:
+  # Model architecture to be used for training (also to be specified as args in the command line)
+  nnunet:
+    in_channels: 1
+    out_channels: 1
+    # NOTE: these info are typically taken from nnUNetPlans.json (if an nnUNet model is trained)
+    base_num_features: 32
+    max_num_features: 320
+    n_conv_per_stage_encoder: [2, 2, 2, 2, 2, 2]
+    n_conv_per_stage_decoder: [2, 2, 2, 2, 2]
+    pool_op_kernel_sizes: [
+      [1, 1, 1],
+      [2, 2, 2],
+      [2, 2, 2],
+      [2, 2, 2],
+      [2, 2, 2],
+      [1, 2, 2] 
+    ]
+    enable_deep_supervision: True
+
+  swinunetr:
+    in_channels: 1
+    out_channels: 1
+    spatial_dims: 3
+    depths: [2, 2, 2, 2]
+    num_heads: [3, 6, 12, 24]   # number of heads in multi-head Attention
+    feature_size: 36
+    use_pretrained: False
