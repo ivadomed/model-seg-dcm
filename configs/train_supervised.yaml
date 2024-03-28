@@ -7,6 +7,7 @@ save_test_preds: True
 preprocessing:
   # Center crop/pad images to the specified size. (NOTE: done after resampling to 1.0x1.0x1.0)
   # values correspond to R-L, A-P, I-S axes of the image after 1mm isotropic resampling.
+  # NOTE for swinunetr: spatial dimensions of input image must be divisible by 32, i.e., we cannot you, for example, 48x48x48
   crop_pad_size: [64, 192, 320]
   patch_size: [64, 64, 64]
 
